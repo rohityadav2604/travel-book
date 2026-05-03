@@ -1,4 +1,6 @@
-import { PaperGrain, Flourish, Stamp } from "@memorybook/design/components/atoms";
+import React from "react";
+import { PageBg, Photo } from "../components/PageShell";
+import { PassportStamp } from "@memorybook/design/components/decorations";
 
 export type JournalPageProps = {
   leftPhotoUrl: string | undefined;
@@ -12,54 +14,110 @@ export default function JournalPage({
   leftPhotoUrl,
   topRightPhotoUrl,
   bottomRightPhotoUrl,
-  quote,
-  date,
 }: JournalPageProps): React.ReactElement {
   return (
-    <div className="relative flex h-full w-full bg-paper">
-      <PaperGrain />
+    <PageBg>
+      {/* ruled lines */}
+      <div
+        style={{
+          position: "absolute",
+          top: 200,
+          left: 80,
+          right: 80,
+          bottom: 100,
+          backgroundImage: "linear-gradient(transparent 27px, rgba(74,53,38,.2) 28px)",
+          backgroundSize: "100% 28px",
+          pointerEvents: "none",
+        }}
+      />
+      {/* margin red line */}
+      <div
+        style={{
+          position: "absolute",
+          top: 60,
+          bottom: 60,
+          left: 130,
+          width: 1,
+          background: "rgba(185,83,46,.45)",
+        }}
+      />
 
-      {/* Left page */}
-      <div className="relative flex-1 overflow-hidden border-r border-ink/10 p-4">
-        <div className="relative h-full w-full overflow-hidden rounded-sm">
-          {leftPhotoUrl && <img src={leftPhotoUrl} alt="" className="h-full w-full object-cover" />}
-          <div
-            className="absolute bottom-0 left-0 right-0 h-8"
-            style={{
-              background: "linear-gradient(to bottom, transparent, rgba(243,231,209,0.9))",
-            }}
-          />
+      {/* header date */}
+      <div
+        style={{
+          position: "absolute",
+          top: 50,
+          left: 80,
+          right: 230,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "baseline",
+          gap: 12,
+          paddingBottom: 8,
+          borderBottom: "1px solid var(--ink-faded)",
+        }}
+      >
+        <div className="f-script" style={{ fontSize: 22, color: "var(--ink-soft)", whiteSpace: "nowrap" }}>
+          Tuesday, the 16th
+        </div>
+        <div className="f-mono" style={{ fontSize: 8, color: "var(--ink-faded)", letterSpacing: ".15em", whiteSpace: "nowrap" }}>
+          FAIR & WINDY
         </div>
       </div>
 
-      {/* Right page */}
-      <div className="relative flex flex-1 flex-col gap-3 p-4">
-        <div className="relative h-1/2 w-full overflow-hidden rounded-sm">
-          {topRightPhotoUrl && <img src={topRightPhotoUrl} alt="" className="h-full w-full object-cover" />}
-        </div>
+      <div
+        className="f-display"
+        style={{ position: "absolute", top: 92, left: 80, fontSize: 28, fontStyle: "italic", color: "var(--terracotta-deep)" }}
+      >
+        Kyoto, evening
+      </div>
 
-        {quote && (
-          <div className="px-2">
-            <Flourish className="mb-2 w-16" />
-            <p className="font-serif text-sm italic leading-relaxed text-ink-soft">
-              &ldquo;{quote}&rdquo;
-            </p>
+      {/* journal text */}
+      <div style={{ position: "absolute", top: 180, left: 145, right: 80, bottom: 110 }}>
+        <p
+          className="f-script dropcap"
+          style={{ fontSize: 21, lineHeight: 1.33, color: "var(--ink-soft)", margin: 0, textWrap: "pretty" }}
+        >
+          Today began before the sun did. We climbed Fushimi Inari while the gates were still wet from morning rain, and the foxes seemed to watch us from every shrine. M. counted 412 torii before she stopped counting. I lost count somewhere around the seventh switchback, when I sat on a stone bench and ate a peach so ripe it stained my journal. I have left the page in. It looks like a sunset.
+        </p>
+        <p className="f-script" style={{ fontSize: 21, lineHeight: 1.33, color: "var(--ink-soft)", marginTop: 16, textWrap: "pretty" }}>
+          We took the slow train back. A boy across the aisle offered me a paper crane. I am keeping it here, between this page and the next.
+        </p>
+      </div>
+
+      {/* paperclip + small photo */}
+      <div style={{ position: "absolute", top: 110, right: 60, transform: "rotate(6deg)" }}>
+        <div style={{ background: "#f7ecd4", padding: "8px 8px 22px", boxShadow: "0 8px 18px rgba(44,31,21,.2)", width: 130 }}>
+          <Photo src={leftPhotoUrl} style={{ width: "100%", aspectRatio: 1 }} />
+          <div className="f-script" style={{ position: "absolute", bottom: 4, left: 0, right: 0, textAlign: "center", fontSize: 13, color: "var(--ink-soft)" }}>
+            Fushimi
           </div>
-        )}
-
-        <div className="relative h-1/3 w-full overflow-hidden rounded-sm">
-          {bottomRightPhotoUrl && <img src={bottomRightPhotoUrl} alt="" className="h-full w-full object-cover" />}
         </div>
-
-        <div className="mt-auto flex items-center justify-between">
-          {date && (
-            <span className="font-mono text-[10px] uppercase tracking-wider text-ink-faded">
-              {date}
-            </span>
-          )}
-          <Stamp text="JOURNAL" />
-        </div>
+        {/* paperclip */}
+        <svg width="40" height="60" viewBox="0 0 40 60" style={{ position: "absolute", top: -20, left: 50 }}>
+          <path
+            d="M10 8 Q 10 4 14 4 L 28 4 Q 32 4 32 8 L 32 48 Q 32 54 26 54 Q 20 54 20 48 L 20 14 Q 20 10 24 10 L 24 42"
+            stroke="#7a6a5a"
+            strokeWidth="1.5"
+            fill="none"
+          />
+        </svg>
       </div>
-    </div>
+
+      {/* small photos stacked on right margin */}
+      <div style={{ position: "absolute", top: 360, right: 60, width: 100, display: "flex", flexDirection: "column", gap: 6 }}>
+        <Photo src={topRightPhotoUrl} style={{ width: "100%", height: 70 }} />
+        <Photo src={bottomRightPhotoUrl} style={{ width: "100%", height: 70 }} />
+      </div>
+
+      {/* signature */}
+      <div style={{ position: "absolute", bottom: 60, right: 100 }}>
+        <div className="f-script" style={{ fontSize: 28, color: "var(--ink)", transform: "rotate(-4deg)" }}>— E.</div>
+      </div>
+
+      <PassportStamp city="KYOTO" date="16·X·74" shape="circle" color="burgundy" rotate={12} style={{ position: "absolute", bottom: 130, left: 50 }} />
+
+      <div className="page-num">— 41 —</div>
+    </PageBg>
   );
 }

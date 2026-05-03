@@ -99,6 +99,9 @@ importers:
       '@memorybook/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@memorybook/design':
+        specifier: workspace:*
+        version: link:../../packages/design
       '@memorybook/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -114,12 +117,25 @@ importers:
       playwright:
         specifier: ^1.52.0
         version: 1.59.1
+      react:
+        specifier: ^19.1.0
+        version: 19.2.5
+      react-dom:
+        specifier: ^19.1.0
+        version: 19.2.5(react@19.2.5)
       tsx:
         specifier: ^4.19.4
         version: 4.21.0
       zod:
         specifier: ^3.24.3
         version: 3.25.76
+    devDependencies:
+      '@types/react':
+        specifier: ^19.1.2
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.1.2
+        version: 19.2.3(@types/react@19.2.14)
 
   apps/worker-upload:
     dependencies:

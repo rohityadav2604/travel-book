@@ -159,13 +159,13 @@ export async function PATCH(request: Request): Promise<NextResponse> {
     const queue = createUploadQueue();
     const photos = await db.photo.findMany({
       where: { sessionId, status: { not: "failed" } },
-      select: { id: true, storageKey: true },
+      select: { id: true, storageKey: true, filename: true },
     });
 
     await addUploadJob(queue, "thumbnail", {
       kind: "thumbnail",
       sessionId,
-      photos: photos.map((p) => ({ photoId: p.id, storageKey: p.storageKey })),
+      photos: photos.map((p) => ({ photoId: p.id, storageKey: p.storageKey, filename: p.filename })),
     });
 
     await queue.close();

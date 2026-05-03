@@ -5,6 +5,29 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 import type { ThumbnailJobPayload } from "@memorybook/shared/validators";
 
+function generateCaption(_metadata: sharp.Metadata, filename: string): string | null {
+  const parts: string[] = [];
+
+  // Filename heuristics: strip common prefixes and extract location words
+  const clean = filename
+    .replace(/\.(jpe?g|png|webp|heic|avif)$/i, "")
+    .replace(/^(IMG_|DSC_|PXL_|100|IMG-|DSC-|MVIMG_|Screenshot_?|\d{4}-\d{2}-\d{2}[ _])/i, "")
+    .replace(/\d{4,8}_\d{4,6}/g, "")
+    .replace(/[_-]+/g, " ")
+    .trim();
+
+  const words = clean.split(/\s+/).filter((w) => w.length > 2 && !/^\d+$/.test(w));
+  const locationWords = words.filter((w) => /^[A-Z]/.test(w)).slice(0, 2);
+
+  if (locationWords.length > 0) {
+    parts.push(locationWords.join(" "));
+  } else if (words.length > 0) {
+    parts.push(words.slice(0, 2).join(" "));
+  }
+
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
+
 export async function processThumbnailJob(payload: ThumbnailJobPayload): Promise<void> {
   const s3 = getStorageClient();
   const config = getStorageConfig();
@@ -41,12 +64,16 @@ export async function processThumbnailJob(payload: ThumbnailJobPayload): Promise
 
       const metadata = await sharp(Buffer.from(bytes)).metadata();
 
+      // Auto-generate caption from EXIF date and filename heuristics
+      const caption = generateCaption(metadata, photo.filename);
+
       await db.photo.update({
         where: { id: photo.photoId },
         data: {
           thumbnailKey,
           width: metadata.width ?? null,
           height: metadata.height ?? null,
+          caption,
           status: "ready",
         },
       });

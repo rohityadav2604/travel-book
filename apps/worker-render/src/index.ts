@@ -6,10 +6,12 @@ import {
 } from "@memorybook/shared/queue";
 import { probeJobPayloadSchema, renderJobPayloadSchema } from "@memorybook/shared/validators";
 import { db } from "@memorybook/db";
-import { getPublicUrl, putObject } from "@memorybook/shared/storage";
+import { getPublicUrl, putObject, getStorageClient, getStorageConfig, GetObjectCommand } from "@memorybook/shared/storage";
 import type { StorageBucket } from "@memorybook/shared/types";
+import type { GetObjectCommandOutput } from "@memorybook/shared/storage";
 import type { Job } from "bullmq";
 import { renderSpread } from "./renderSpread";
+import { renderSpreadToHtml } from "./renderSsr";
 import { assemblePdf } from "./assemblePdf";
 import { closeBrowser } from "./browser";
 
@@ -30,6 +32,27 @@ process.once("SIGINT", () => {
 process.once("SIGTERM", () => {
   void shutdown();
 });
+
+async function fetchImageAsDataUri(bucket: StorageBucket, key: string): Promise<string | undefined> {
+  try {
+    const s3 = getStorageClient();
+    const config = getStorageConfig();
+    const result = (await s3.send(
+      new GetObjectCommand({
+        Bucket: config.buckets[bucket],
+        Key: key,
+      }),
+    )) as GetObjectCommandOutput;
+    if (!result.Body) return undefined;
+    const bytes = await result.Body.transformToByteArray();
+    const mimeType = result.ContentType || "image/jpeg";
+    const base64 = Buffer.from(bytes).toString("base64");
+    return `data:${mimeType};base64,${base64}`;
+  } catch (err) {
+    console.error("Failed to fetch image for embedding:", err);
+    return undefined;
+  }
+}
 
 async function processRenderJob(
   job: Job<RenderJobData, QueueJobResult, RenderJobName>,
@@ -75,54 +98,33 @@ async function processRenderJob(
     const photoMap = new Map(book.session.photos.map((p) => [p.id, p]));
     const spreadBuffers: Buffer[] = [];
 
-    const width = payload.quality === "print" ? 2480 : 1240;
-    const height = payload.quality === "print" ? 1754 : 877;
+    const width = payload.quality === "print" ? 1200 : 600;
+    const height = payload.quality === "print" ? 1200 : 600;
 
     for (const placement of placements) {
-      const slots: Record<string, string> = {};
+      const slots: Record<string, string | undefined> = {};
+      const captions: Record<string, string> = {};
       for (const a of placement.assignments) {
         const photo = photoMap.get(a.photoId);
         if (photo?.thumbnailKey) {
-          slots[a.slotId] = getPublicUrl("public", photo.thumbnailKey);
+          const dataUri = await fetchImageAsDataUri("public", photo.thumbnailKey);
+          slots[a.slotId] = dataUri ?? getPublicUrl("public", photo.thumbnailKey);
+        }
+        if (photo?.caption) {
+          captions[a.slotId] = photo.caption;
         }
       }
 
-      const templateName =
-        placement.templateName ??
-        (placement.spreadId === "cover"
-          ? "Cover"
-          : placement.spreadId.startsWith("spread-")
-            ? parseInt(placement.spreadId.replace("spread-", ""), 10) % 2 !== 0
-              ? "GrandVista"
-              : "JournalPage"
-            : "GrandVista");
+      const templateName = placement.templateName ?? "GrandVista";
 
-      const html = `
-        <div style="width:${width}px;height:${height}px;background:#f3e7d1;overflow:hidden;">
-          ${templateName === "GrandVista" || templateName === "Cover" || templateName === "ChapterDivider" ? `
-            <div style="position:relative;width:100%;height:100%;overflow:hidden;">
-              <img src="${slots.hero || ""}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
-              <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(44,31,21,0.25) 100%);"></div>
-            </div>
-          ` : `
-            <div style="display:flex;width:100%;height:100%;background:#f3e7d1;">
-              <div style="flex:1;border-right:1px solid rgba(44,31,21,0.1);padding:16px;">
-                <div style="position:relative;width:100%;height:100%;overflow:hidden;border-radius:2px;">
-                  <img src="${slots.left || ""}" style="width:100%;height:100%;object-fit:cover;" />
-                </div>
-              </div>
-              <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:16px;">
-                <div style="flex:1;overflow:hidden;border-radius:2px;">
-                  <img src="${slots.topRight || ""}" style="width:100%;height:100%;object-fit:cover;" />
-                </div>
-                <div style="flex:1;overflow:hidden;border-radius:2px;">
-                  <img src="${slots.bottomRight || ""}" style="width:100%;height:100%;object-fit:cover;" />
-                </div>
-              </div>
-            </div>
-          `}
-        </div>
-      `;
+      const html = renderSpreadToHtml({
+        templateName,
+        slots,
+        captions: Object.keys(captions).length > 0 ? captions : undefined,
+        width,
+        height,
+        quality: payload.quality,
+      });
 
       const buffer = await renderSpread({ html, width, height, quality: payload.quality });
       spreadBuffers.push(buffer);

@@ -1,0 +1,263 @@
+/* ============================================================
+   Wanderbound — Travel Book Templates
+   1970s warm earthy, journal-feel
+   ============================================================ */
+
+:root {
+  /* Palette — sun-faded 1970s */
+  --paper: #f3e7d1;          /* aged cream */
+  --paper-2: #ecdcb9;        /* deeper cream */
+  --paper-3: #e3cfa3;        /* kraft */
+  --ink: #2c1f15;            /* deep walnut */
+  --ink-soft: #4a3526;
+  --ink-faded: #6b4f3a;
+
+  --terracotta: #b9532e;
+  --terracotta-deep: #8b3a1e;
+  --rust: #c66a3a;
+  --ochre: #c89441;
+  --mustard: #d9a441;
+  --olive: #6b6b3a;
+  --olive-deep: #4f5028;
+  --moss: #7a8442;
+  --sage: #9aa57a;
+  --burgundy: #6e2a23;
+  --teal: #3f6b6b;
+
+  --shadow: 0 1px 2px rgba(44,31,21,.08), 0 8px 30px rgba(44,31,21,.12);
+}
+
+/* Fonts */
+.f-display { font-family: "DM Serif Display", "Playfair Display", Georgia, serif; font-weight: 400; }
+.f-serif   { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 400; }
+.f-sans    { font-family: "Cormorant SC", "Cormorant Garamond", Georgia, serif; letter-spacing: .12em; }
+.f-script  { font-family: "Caveat", "Homemade Apple", cursive; }
+.f-hand    { font-family: "Homemade Apple", "Caveat", cursive; }
+.f-mono    { font-family: "Special Elite", "Courier Prime", monospace; }
+
+/* Page base */
+.page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
+  font-family: "Cormorant Garamond", Georgia, serif;
+}
+
+/* Paper texture — fine grain + age spots */
+.paper-texture {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 15%, rgba(139,90,43,.10), transparent 40%),
+    radial-gradient(ellipse at 80% 85%, rgba(139,90,43,.08), transparent 45%),
+    radial-gradient(ellipse at 50% 50%, rgba(255,240,210,.25), transparent 60%);
+  pointer-events: none;
+}
+.paper-grain {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyMDAnIGhlaWdodD0nMjAwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC44NScgbnVtT2N0YXZlcz0nMicgc3RpdGNoVGlsZXM9J3N0aXRjaCcvPjxmZUNvbG9yTWF0cml4IHZhbHVlcz0nMCAwIDAgMCAwLjE3LCAwIDAgMCAwIDAuMTIsIDAgMCAwIDAgMC4wOCwgMCAwIDAgMC4xOCAwJy8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScgZmlsdGVyPSd1cmwoI24pJy8+PC9zdmc+");
+  mix-blend-mode: multiply;
+  opacity: .35;
+  pointer-events: none;
+}
+.paper-edge {
+  position: absolute; inset: 0;
+  box-shadow: inset 0 0 60px rgba(110,70,30,.18), inset 0 0 12px rgba(110,70,30,.12);
+  pointer-events: none;
+}
+
+/* Coffee stain */
+.coffee-stain {
+  position: absolute;
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%,
+    rgba(110,55,20,.0) 35%,
+    rgba(110,55,20,.20) 55%,
+    rgba(110,55,20,.32) 70%,
+    rgba(110,55,20,.18) 80%,
+    rgba(110,55,20,0) 95%);
+  filter: blur(.5px);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* Photo frame — slight warm tint, soft shadow, vintage border */
+.photo {
+  position: relative;
+  background: #2a2017;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.photo::after {
+  /* warm tint over photo */
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,200,140,.08), rgba(180,90,40,.10));
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.photo-inner {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: saturate(.85) contrast(.95) sepia(.18) brightness(.98);
+}
+.photo-caption {
+  font-family: "Caveat", cursive;
+  color: var(--ink-soft);
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+/* Polaroid */
+.polaroid {
+  background: #f7ecd4;
+  padding: 10px 10px 44px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.1), 0 12px 28px rgba(44,31,21,.18);
+  position: relative;
+}
+.polaroid .photo { aspect-ratio: 1; width: 100%; height: auto; }
+.polaroid-caption {
+  position: absolute;
+  bottom: 8px; left: 12px; right: 12px;
+  text-align: center;
+  font-family: "Caveat", cursive;
+  font-size: 18px;
+  color: var(--ink-soft);
+}
+
+/* Tape */
+.tape {
+  position: absolute;
+  width: 90px; height: 24px;
+  background: linear-gradient(180deg, rgba(217,164,65,.55), rgba(184,138,52,.55));
+  box-shadow: 0 2px 4px rgba(0,0,0,.10);
+  border-left: 1px dashed rgba(255,255,255,.3);
+  border-right: 1px dashed rgba(255,255,255,.3);
+}
+.tape::before, .tape::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(90deg, rgba(255,255,255,.25), transparent);
+}
+.tape.cream { background: linear-gradient(180deg, rgba(243,231,209,.7), rgba(225,210,180,.7)); }
+.tape.terra { background: linear-gradient(180deg, rgba(185,83,46,.55), rgba(140,60,30,.55)); }
+.tape.olive { background: linear-gradient(180deg, rgba(107,107,58,.55), rgba(80,80,40,.55)); }
+
+/* Stamps */
+.stamp {
+  display: inline-block;
+  background: var(--paper-2);
+  padding: 8px 10px 6px;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0,0,0,.12);
+  font-family: "Special Elite", monospace;
+}
+.stamp::before {
+  content: ""; position: absolute; inset: -4px;
+  background:
+    radial-gradient(circle, var(--paper-2) 3px, transparent 3.5px) 0 0/8px 8px;
+  z-index: -1;
+}
+
+.passport-stamp {
+  position: absolute;
+  border: 2px solid var(--terracotta-deep);
+  color: var(--terracotta-deep);
+  padding: 6px 14px;
+  font-family: "Special Elite", monospace;
+  font-size: 12px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  opacity: .82;
+  mix-blend-mode: multiply;
+}
+.passport-stamp.circle {
+  border-radius: 50%;
+  width: 90px; height: 90px;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  font-size: 10px;
+  line-height: 1.1;
+}
+.passport-stamp.olive { border-color: var(--olive-deep); color: var(--olive-deep); }
+.passport-stamp.teal { border-color: var(--teal); color: var(--teal); }
+
+/* Decorative dividers */
+.flourish {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--terracotta);
+}
+.flourish .line { flex: 1; height: 1px; background: currentColor; opacity: .4; }
+.flourish .dot  { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+/* Section heading small caps */
+.smallcaps {
+  font-family: "Cormorant SC", "Cormorant Garamond", serif;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Ticket */
+.ticket {
+  background: var(--paper-2);
+  border: 1px dashed var(--ink-faded);
+  padding: 10px 16px;
+  position: relative;
+  font-family: "Special Elite", monospace;
+  font-size: 11px;
+  letter-spacing: .1em;
+  color: var(--ink-soft);
+}
+.ticket::before, .ticket::after {
+  content: "";
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 12px; height: 12px;
+  background: var(--paper);
+  border-radius: 50%;
+}
+.ticket::before { left: -6px; }
+.ticket::after  { right: -6px; }
+
+/* Page numbers */
+.page-num {
+  position: absolute;
+  bottom: 28px;
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  color: var(--ink-faded);
+  font-size: 14px;
+  letter-spacing: .1em;
+}
+
+/* Drop cap */
+.dropcap::first-letter {
+  font-family: "DM Serif Display", serif;
+  float: left;
+  font-size: 5.2em;
+  line-height: .85;
+  padding: 6px 10px 0 0;
+  color: var(--terracotta-deep);
+}
+
+/* Utility */
+.rotate-l-2 { transform: rotate(-2deg); }
+.rotate-l-4 { transform: rotate(-4deg); }
+.rotate-l-6 { transform: rotate(-6deg); }
+.rotate-r-2 { transform: rotate(2deg); }
+.rotate-r-4 { transform: rotate(4deg); }
+.rotate-r-6 { transform: rotate(6deg); }
+
+/* Book wrapper */
+body {
+  margin: 0;
+  background:
+    radial-gradient(ellipse at center, #3a2a1c 0%, #1a120c 70%, #0c0805 100%);
+  min-height: 100vh;
+  font-family: "Cormorant Garamond", serif;
+  color: #f3e7d1;
+  overflow: hidden;
+}

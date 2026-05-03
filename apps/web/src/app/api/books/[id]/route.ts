@@ -38,6 +38,8 @@ export async function GET(
         width: p.width,
         height: p.height,
         displayOrder: p.displayOrder,
+        caption: p.caption,
+        filename: p.filename,
       })),
     },
   });

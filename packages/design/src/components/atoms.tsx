@@ -1,3 +1,4 @@
+import React from "react";
 import { colorTokens } from "../tokens";
 
 export function Tape({ className }: { className?: string }): React.ReactElement {

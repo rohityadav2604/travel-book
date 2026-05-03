@@ -16,36 +16,46 @@ function score(photo: PhotoInput, slot: SpreadDef["slots"][number]): number {
   return Math.max(0, 1 - dist);
 }
 
+function findBestPhoto(
+  pool: PhotoInput[],
+  slot: SpreadDef["slots"][number],
+): { photo: PhotoInput; index: number } | null {
+  let bestIndex = -1;
+  let bestScore = -1;
+
+  for (let i = 0; i < pool.length; i++) {
+    const photo = pool[i];
+    if (!photo) continue;
+    const s = score(photo, slot);
+    if (s > bestScore) {
+      bestScore = s;
+      bestIndex = i;
+    }
+  }
+
+  if (bestIndex === -1) return null;
+  const removed = pool.splice(bestIndex, 1);
+  return removed[0] ? { photo: removed[0], index: bestIndex } : null;
+}
+
 export function assignPhotosToSpreads(
   photos: PhotoInput[],
   spreads: SpreadDef[],
 ): PlacementResult[] {
-  const unassigned = [...photos];
+  const pinned = photos.filter((p) => p.pinned);
+  const unpinned = photos.filter((p) => !p.pinned);
   const results: PlacementResult[] = [];
 
   for (const spread of spreads) {
     const assignments: PlacementResult["assignments"] = [];
 
     for (const slot of spread.slots) {
-      if (unassigned.length === 0) break;
+      // Try pinned pool first, then unpinned
+      const fromPinned = pinned.length > 0 ? findBestPhoto(pinned, slot) : null;
+      const chosen = fromPinned ?? (unpinned.length > 0 ? findBestPhoto(unpinned, slot) : null);
 
-      let bestIndex = 0;
-      let bestScore = -1;
-
-      for (let i = 0; i < unassigned.length; i++) {
-        const photo = unassigned[i];
-        if (!photo) continue;
-        const s = score(photo, slot);
-        if (s > bestScore) {
-          bestScore = s;
-          bestIndex = i;
-        }
-      }
-
-      const removed = unassigned.splice(bestIndex, 1);
-      const chosen = removed[0];
       if (chosen) {
-        assignments.push({ slotId: slot.id, photoId: chosen.id });
+        assignments.push({ slotId: slot.id, photoId: chosen.photo.id });
       }
     }
 

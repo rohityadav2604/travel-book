@@ -42,6 +42,7 @@ export const thumbnailJobPayloadSchema = z.object({
     z.object({
       photoId: z.string().min(1),
       storageKey: z.string().min(1),
+      filename: z.string().min(1),
     }),
   ),
 });

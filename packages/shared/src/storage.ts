@@ -7,10 +7,13 @@ import {
   PutObjectCommand,
   S3Client,
   UploadPartCommand,
+  type GetObjectCommandOutput,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl as presignGetObject } from "@aws-sdk/s3-request-presigner";
 import type { StorageBucket } from "./types";
 import { storageEnvSchema } from "./validators";
+
+export { GetObjectCommand, type GetObjectCommandOutput };
 
 export type StorageConfig = {
   endpoint: string;

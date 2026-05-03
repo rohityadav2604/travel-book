@@ -1,0 +1,28 @@
+// Photo URLs — curated real travel imagery (Unsplash, free use)
+// Warm, vintage-feeling, varied destinations
+window.PHOTOS = {
+  mountains:   "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
+  coast:       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+  village:     "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1200&q=80",
+  street:      "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+  cafe:        "https://images.unsplash.com/photo-1453614512568-c4024d13c247?w=1200&q=80",
+  desert:      "https://images.unsplash.com/photo-1473580044384-7ba9967e16a0?w=1200&q=80",
+  market:      "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=1200&q=80",
+  temple:      "https://images.unsplash.com/photo-1493780474015-ba834fd0ce2f?w=1200&q=80",
+  road:        "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=80",
+  field:       "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80",
+  italy:       "https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=1200&q=80",
+  paris:       "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80",
+  hands:       "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&q=80",
+  food:        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80",
+  windows:     "https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?w=1200&q=80",
+  boat:        "https://images.unsplash.com/photo-1473773508845-188df298d2d1?w=1200&q=80",
+  forest:      "https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200&q=80",
+  sunset:      "https://images.unsplash.com/photo-1495567720989-cebdbdd97913?w=1200&q=80",
+  alley:       "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80",
+  vespa:       "https://images.unsplash.com/photo-1498307833015-e7b400441eb8?w=1200&q=80",
+  flowers:     "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1200&q=80",
+  train:       "https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=1200&q=80",
+  beach:       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+  postcard:    "https://images.unsplash.com/photo-1516834474-48c0abc2a902?w=1200&q=80",
+};
