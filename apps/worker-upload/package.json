@@ -1,0 +1,22 @@
+{
+  "name": "@memorybook/worker-upload",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "dotenv -e ../../.env -- tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1041.0",
+    "@memorybook/db": "workspace:*",
+    "@memorybook/shared": "workspace:*",
+    "@memorybook/templates": "workspace:*",
+    "bullmq": "^5.49.1",
+    "sharp": "^0.34.1",
+    "tsx": "^4.19.4",
+    "zod": "^3.24.3"
+  }
+}

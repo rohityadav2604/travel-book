@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PhotoStatus {
+  uploaded
+  processing
+  ready
+  failed
+}
+
+enum BookStatus {
+  draft
+  placing
+  ready
+  rendering
+  exported
+  failed
+}
+
+model Session {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime
+
+  photos Photo[]
+  books  Book[]
+}
+
+model Photo {
+  id           String      @id @default(cuid())
+  sessionId    String
+  storageKey   String
+  thumbnailKey String?
+  filename     String
+  mimeType     String
+  sizeBytes    Int
+  displayOrder Int
+  width        Int?
+  height       Int?
+  pinned       Boolean     @default(false)
+  excluded     Boolean     @default(false)
+  status       PhotoStatus @default(uploaded)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, displayOrder])
+  @@index([sessionId, status])
+}
+
+model Book {
+  id            String     @id @default(cuid())
+  sessionId     String
+  title         String?
+  placementJson Json?
+  printPdfKey   String?
+  screenPdfKey  String?
+  status        BookStatus @default(draft)
+  exportedAt    DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([status])
+}

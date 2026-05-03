@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -o -E \"class=\\\\\\\\\\\\\\\\\\\\\"[^\\\\\"\\\\\\\\\\\\\\\\]{1,200}\" \"/Users/rohityadav/Desktop/project/travel-book/design/Wanderbound Travel Book _standalone_.html\")",
+      "Bash(grep -o \"class=\\\\\\\\\\\\\\\\.[a-zA-Z]\\\\\\\\{1,100\\\\\\\\}\" \"/Users/rohityadav/Desktop/project/travel-book/design/Wanderbound Travel Book _standalone_.html\")",
+      "Bash(python3 *)",
+      "Bash(rm /tmp/_inspect.html)",
+      "Read(//private/tmp/**)"
+    ]
+  }
+}

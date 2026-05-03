@@ -1,0 +1,22 @@
+{
+  "name": "@memorybook/worker-render",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "dotenv -e ../../.env -- tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@memorybook/db": "workspace:*",
+    "@memorybook/shared": "workspace:*",
+    "@memorybook/templates": "workspace:*",
+    "bullmq": "^5.49.1",
+    "pdf-lib": "^1.17.1",
+    "playwright": "^1.52.0",
+    "tsx": "^4.19.4",
+    "zod": "^3.24.3"
+  }
+}
