@@ -7,11 +7,11 @@ import {
   addUploadJob,
   type StorageBucket,
 } from "@memorybook/shared";
+import { ensureSession } from "@/lib/session";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
 const CHUNK_SIZE = 5 * 1024 * 1024;
-const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30;
 
 const initSchema = z.object({
   files: z.array(
@@ -56,12 +56,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  // Every upload batch gets a brand-new session so old photos never bleed in.
-  const sessionId = crypto.randomUUID();
-  const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
-  await db.session.create({
-    data: { id: sessionId, expiresAt },
-  });
+  // Re-use the browser's anonymous session so books are tied to the same
+  // cookie identity and show up in the library.
+  const session = await ensureSession();
+  const sessionId = session.id;
 
   const uploads: {
     photoId: string;

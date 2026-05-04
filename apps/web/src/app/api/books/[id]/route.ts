@@ -28,6 +28,7 @@ const placementSchema = z.object({
 const patchSchema = z.object({
   title: z.string().nullable().optional(),
   placementJson: z.array(placementSchema).optional(),
+  sessionId: z.string().optional(),
 });
 
 type BookWithPhotos = {
@@ -125,7 +126,12 @@ export async function PATCH(
     return NextResponse.json({ error: "Book not found" }, { status: 404 });
   }
 
-  if (sessionId && book.sessionId !== sessionId) {
+  const bodySessionId = parsed.data.sessionId;
+  const isAuthorized =
+    (sessionId && book.sessionId === sessionId) ||
+    (bodySessionId && book.sessionId === bodySessionId);
+
+  if (!isAuthorized) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -141,6 +147,12 @@ export async function PATCH(
     data.screenPdfKey = null;
     data.exportedAt = null;
     data.status = "ready";
+  }
+
+  // If the book was created with an old upload session, migrate it to the
+  // current browser cookie session so it appears in the library going forward.
+  if (sessionId && book.sessionId !== sessionId) {
+    data.sessionId = sessionId;
   }
 
   await db.book.update({

@@ -765,6 +765,7 @@ export default function BookPage(): React.ReactElement {
         body: JSON.stringify({
           title: draftBook.title,
           placementJson: draftBook.placementJson,
+          sessionId: book.sessionId,
         }),
       });
 
