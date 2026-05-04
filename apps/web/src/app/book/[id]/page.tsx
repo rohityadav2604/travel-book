@@ -68,9 +68,11 @@ export default function BookPage(): React.ReactElement {
 
   const [book, setBook] = useState<BookData | null>(null);
   const [idx, setIdx] = useState(0);
-  const [flipping, setFlipping] = useState<"next" | "prev" | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
   const [exportUrls, setExportUrls] = useState<{ printUrl: string | null; screenUrl: string | null } | null>(null);
+
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     if (!bookId) return;
@@ -79,22 +81,58 @@ export default function BookPage(): React.ReactElement {
       .then((data) => setBook(data.book));
   }, [bookId]);
 
-  const goto = useCallback(
-    (next: number) => {
-      if (flipping) return;
-      const spreads = book?.placementJson ?? [];
-      if (next < 0 || next >= spreads.length) return;
-      setFlipping(next > idx ? "next" : "prev");
-      setTimeout(() => {
-        setIdx(next);
-        setTimeout(() => setFlipping(null), 50);
-      }, 520);
-    },
-    [book, flipping, idx]
-  );
+  const spreads = book?.placementJson ?? [];
 
-  const next = useCallback(() => goto(idx + 1), [goto, idx]);
-  const prev = useCallback(() => goto(idx - 1), [goto, idx]);
+  // IntersectionObserver to track which slide is centered
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (!slider || spreads.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const i = Number(entry.target.getAttribute("data-index"));
+            if (!Number.isNaN(i)) {
+              setIdx(i);
+            }
+          }
+        });
+      },
+      {
+        root: slider,
+        threshold: 0.6,
+      }
+    );
+
+    slideRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [spreads.length]);
+
+  const scrollToIndex = useCallback((targetIdx: number) => {
+    const slider = sliderRef.current;
+    const slide = slideRefs.current[targetIdx];
+    if (!slider || !slide) return;
+
+    const sliderRect = slider.getBoundingClientRect();
+    const slideRect = slide.getBoundingClientRect();
+    const scrollLeft = slider.scrollLeft + slideRect.left - sliderRect.left - (sliderRect.width - slideRect.width) / 2;
+
+    slider.scrollTo({ left: scrollLeft, behavior: "smooth" });
+  }, []);
+
+  const next = useCallback(() => {
+    const target = Math.min(idx + 1, spreads.length - 1);
+    scrollToIndex(target);
+  }, [idx, spreads.length, scrollToIndex]);
+
+  const prev = useCallback(() => {
+    const target = Math.max(idx - 1, 0);
+    scrollToIndex(target);
+  }, [idx, scrollToIndex]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -110,6 +148,54 @@ export default function BookPage(): React.ReactElement {
     const data = await res.json();
     setExportUrls(data);
   }, [bookId]);
+
+  const photoMap = new Map(book?.photos.map((p) => [p.id, p]) ?? []);
+
+  const resolveTemplate = (spread: (typeof spreads)[number] | undefined): string => {
+    return spread?.templateName ??
+      (spread?.spreadId === "cover"
+        ? "Cover"
+        : spread?.spreadId.startsWith("spread-")
+          ? parseInt(spread.spreadId.replace("spread-", ""), 10) % 2 !== 0
+            ? "GrandVista"
+            : "JournalPage"
+          : "GrandVista");
+  };
+
+  const buildSpreadData = (spread: (typeof spreads)[number] | undefined) => {
+    const s: Record<string, string | undefined> = {};
+    const c: Record<string, string> = {};
+    if (!spread) return { slots: s, captions: c };
+    for (const a of spread.assignments) {
+      const photo = photoMap.get(a.photoId);
+      if (photo) {
+        s[a.slotId] = imageUrl("public", photo.thumbnailKey);
+        if (photo.caption) {
+          c[a.slotId] = photo.caption;
+        }
+      }
+    }
+    return { slots: s, captions: c };
+  };
+
+  const templateLabel = (t: string) => {
+    const labels: Record<string, string> = {
+      Cover: "01 · Cover",
+      InsideFront: "02 · Inside Front",
+      ChapterDivider: "03 · Chapter Title",
+      GrandVista: "04 · Full-Bleed Hero",
+      JournalPage: "05 · Photo + Journal",
+      PolaroidWall: "06 · Polaroid Collage",
+      GoldenHour: "07 · Golden Hour",
+      ContactSheet: "08 · Contact Sheet",
+      MapPage: "09 · Map Page",
+      QuotePage: "10 · Quote",
+      Ephemera: "11 · Tickets & Ephemera",
+      InsideBack: "12 · Inside Back",
+      BackCover: "13 · Back Cover",
+    };
+    return labels[t] ?? t;
+  };
 
   if (!book) {
     return (
@@ -131,96 +217,7 @@ export default function BookPage(): React.ReactElement {
     );
   }
 
-  const spreads = book.placementJson ?? [];
-  const current = spreads[idx];
-
-  const photoMap = new Map(book.photos.map((p) => [p.id, p]));
-
-  const slots: Record<string, string | undefined> = {};
-  const captions: Record<string, string> = {};
-  if (current) {
-    for (const a of current.assignments) {
-      const photo = photoMap.get(a.photoId);
-      if (photo) {
-        slots[a.slotId] = imageUrl("public", photo.thumbnailKey);
-        if (photo.caption) {
-          captions[a.slotId] = photo.caption;
-        }
-      }
-    }
-  }
-
-  const currentTemplate =
-    current?.templateName ??
-    (current?.spreadId === "cover"
-      ? "Cover"
-      : current?.spreadId.startsWith("spread-")
-        ? parseInt(current.spreadId.replace("spread-", ""), 10) % 2 !== 0
-          ? "GrandVista"
-          : "JournalPage"
-        : "GrandVista");
-
-  const targetIdx = flipping === "next" ? idx + 1 : flipping === "prev" ? idx - 1 : idx;
-  const target = spreads[targetIdx] ?? current;
-  const flipPage = flipping === "next" ? current : flipping === "prev" ? spreads[idx - 1] : null;
-
-  const targetTemplate =
-    target?.templateName ??
-    (target?.spreadId === "cover"
-      ? "Cover"
-      : target?.spreadId.startsWith("spread-")
-        ? parseInt(target.spreadId.replace("spread-", ""), 10) % 2 !== 0
-          ? "GrandVista"
-          : "JournalPage"
-        : "GrandVista");
-
-  const flipTemplate =
-    flipPage?.templateName ??
-    (flipPage?.spreadId === "cover"
-      ? "Cover"
-      : flipPage?.spreadId.startsWith("spread-")
-        ? parseInt(flipPage.spreadId.replace("spread-", ""), 10) % 2 !== 0
-          ? "GrandVista"
-          : "JournalPage"
-        : "GrandVista");
-
-  const buildSpreadData = (spread: (typeof spreads)[number] | undefined) => {
-    const s: Record<string, string | undefined> = {};
-    const c: Record<string, string> = {};
-    if (!spread) return { slots: s, captions: c };
-    for (const a of spread.assignments) {
-      const photo = photoMap.get(a.photoId);
-      if (photo) {
-        s[a.slotId] = imageUrl("public", photo.thumbnailKey);
-        if (photo.caption) {
-          c[a.slotId] = photo.caption;
-        }
-      }
-    }
-    return { slots: s, captions: c };
-  };
-
-  const { slots: targetSlots, captions: targetCaptions } = buildSpreadData(target);
-  const { slots: flipSlots, captions: flipCaptions } = buildSpreadData(flipPage ?? undefined);
-
-  const templateLabel = (t: string) => {
-    const labels: Record<string, string> = {
-      Cover: "01 · Cover",
-      InsideFront: "02 · Inside Front",
-      ChapterDivider: "03 · Chapter Title",
-      GrandVista: "04 · Full-Bleed Hero",
-      JournalPage: "05 · Photo + Journal",
-      PolaroidWall: "06 · Polaroid Collage",
-      GoldenHour: "07 · Golden Hour",
-      ContactSheet: "08 · Contact Sheet",
-      MapPage: "09 · Map Page",
-      QuotePage: "10 · Quote",
-      Ephemera: "11 · Tickets & Ephemera",
-      InsideBack: "12 · Inside Back",
-      BackCover: "13 · Back Cover",
-    };
-    return labels[t] ?? t;
-  };
+  const currentTemplate = resolveTemplate(spreads[idx]);
 
   return (
     <div className="app-root flex min-h-screen flex-col">
@@ -240,74 +237,39 @@ export default function BookPage(): React.ReactElement {
         </div>
       </header>
 
-      {/* Stage */}
+      {/* Page Slider */}
       <main className="stage">
-        {/* Dot strip */}
-        <div className="strip">
-          {spreads.map((s, i) => (
-            <button
-              key={s.spreadId}
-              className={`strip-dot ${i === idx ? "active" : ""}`}
-              onClick={() => goto(i)}
-              title={`Spread ${i + 1}`}
-            >
-              <span className="strip-num">{String(i + 1).padStart(2, "0")}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Book wrap */}
-        <div className="book-wrap">
-          <button className="nav-btn nav-prev" onClick={prev} disabled={idx === 0} aria-label="Previous page">
+        <div className="slider-wrap">
+          <button className="slider-nav slider-prev" onClick={prev} disabled={idx === 0} aria-label="Previous page">
             <svg width="28" height="28" viewBox="0 0 28 28">
               <path d="M18 6 L 10 14 L 18 22" fill="none" stroke="currentColor" strokeWidth="1.5" />
             </svg>
           </button>
 
-          {/* The book */}
-          <div className="book">
-            {/* Binding shadows */}
-            <div className="book-binding-l" />
-            <div className="book-binding-r" />
-
-            <div className="page-stack">
-              {/* Underneath = target page */}
-              <div className="page-under">
-                <div className="page-frame">
-                  <ScaledPage>
-                    <SpreadComposer templateName={targetTemplate} slots={targetSlots} captions={targetCaptions} />
-                  </ScaledPage>
-                </div>
-              </div>
-
-              {/* On top = current page that flips away */}
-              {flipping && flipPage && (
-                <div className={`page-flipper ${flipping}`}>
-                  <div className="page-flipper-front">
+          <div className="slider-track" ref={sliderRef}>
+            {spreads.map((spread, i) => {
+              const template = resolveTemplate(spread);
+              const { slots, captions } = buildSpreadData(spread);
+              return (
+                <div
+                  key={spread.spreadId}
+                  className={`slider-item ${i === idx ? "active" : ""}`}
+                  data-index={i}
+                  ref={(el) => { slideRefs.current[i] = el; }}
+                >
+                  <div className="slider-page">
                     <div className="page-frame">
                       <ScaledPage>
-                        <SpreadComposer templateName={flipTemplate} slots={flipSlots} captions={flipCaptions} />
+                        <SpreadComposer templateName={template} slots={slots} captions={captions} />
                       </ScaledPage>
                     </div>
                   </div>
-                  <div className="page-flipper-back" />
                 </div>
-              )}
-
-              {/* Normal: show current page */}
-              {!flipping && current && (
-                <div className="page-current">
-                  <div className="page-frame">
-                    <ScaledPage>
-                        <SpreadComposer templateName={currentTemplate} slots={slots} captions={captions} />
-                    </ScaledPage>
-                  </div>
-                </div>
-              )}
-            </div>
+              );
+            })}
           </div>
 
-          <button className="nav-btn nav-next" onClick={next} disabled={idx === spreads.length - 1} aria-label="Next page">
+          <button className="slider-nav slider-next" onClick={next} disabled={idx === spreads.length - 1} aria-label="Next page">
             <svg width="28" height="28" viewBox="0 0 28 28">
               <path d="M10 6 L 18 14 L 10 22" fill="none" stroke="currentColor" strokeWidth="1.5" />
             </svg>
@@ -321,7 +283,7 @@ export default function BookPage(): React.ReactElement {
       </main>
 
       {/* Keyboard hint */}
-      <div className="hint">← → arrow keys to turn pages</div>
+      <div className="hint">← → arrow keys to browse pages</div>
 
       {/* Download button - floating */}
       <button
