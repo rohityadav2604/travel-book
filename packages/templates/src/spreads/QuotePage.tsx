@@ -5,9 +5,10 @@ import { Flourish, FernSprig, Botanical } from "@memorybook/design/components/de
 export type QuotePageProps = {
   quote: string | undefined;
   caption: string | undefined;
+  texts?: Record<string, string> | undefined;
 };
 
-export default function QuotePage({ quote, caption }: QuotePageProps): React.ReactElement {
+export default function QuotePage({ quote, caption, texts }: QuotePageProps): React.ReactElement {
   return (
     <PageBg>
       {/* warm vignette */}
@@ -75,22 +76,19 @@ export default function QuotePage({ quote, caption }: QuotePageProps): React.Rea
             textWrap: "balance",
           }}
         >
-          {quote || (
-            <>
-              Not all those who wander
+          {(quote || texts?.quote || "Not all those who wander\nare lost -- some of us\nare simply taking the long way home.").split("\n").map((line) => (
+            <React.Fragment key={line}>
+              {line}
               <br />
-              are lost — some of us
-              <br />
-              are simply taking the long way home.
-            </>
-          )}
+            </React.Fragment>
+          ))}
         </p>
         <Flourish width={140} color="#8b3a1e" />
         <div className="f-script" style={{ fontSize: 26, marginTop: 28, color: "var(--terracotta-deep)" }}>
-          {caption || "— found in a guesthouse in Hanoi"}
+          {caption || texts?.caption || "-- found in a guesthouse in Hanoi"}
         </div>
         <div className="smallcaps" style={{ fontSize: 10, color: "var(--ink-faded)", marginTop: 16, letterSpacing: "0.4em" }}>
-          author unknown · 1971
+          {texts?.authorLine || "author unknown · 1971"}
         </div>
       </div>
 
@@ -102,7 +100,7 @@ export default function QuotePage({ quote, caption }: QuotePageProps): React.Rea
       </div>
 
       <div className="page-num" style={{ left: "50%", transform: "translateX(-50%)" }}>
-        — 50 —
+        {texts?.pageNumber || "-- 50 --"}
       </div>
     </PageBg>
   );

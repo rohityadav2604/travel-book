@@ -5,6 +5,7 @@ import { Flourish, FernSprig } from "@memorybook/design/components/decorations";
 export type IndexPageProps = {
   chapters?: Array<{ num: string; title: string; sub: string; page: string }>;
   stats?: Array<{ num: string; label: string }>;
+  texts?: Record<string, string> | undefined;
 };
 
 export default function IndexPage({
@@ -21,19 +22,37 @@ export default function IndexPage({
     { num: "94", label: "days" },
     { num: "212", label: "photographs" },
   ],
+  texts,
 }: IndexPageProps): React.ReactElement {
+  const renderedChapters = chapters.map((chapter, index) => {
+    const field = `chapter${index + 1}`;
+    return {
+      num: texts?.[`${field}Num`] ?? chapter.num,
+      title: texts?.[`${field}Title`] ?? chapter.title,
+      sub: texts?.[`${field}Sub`] ?? chapter.sub,
+      page: texts?.[`${field}Page`] ?? chapter.page,
+    };
+  });
+  const renderedStats = stats.map((stat, index) => {
+    const field = `stat${index + 1}`;
+    return {
+      num: texts?.[`${field}Num`] ?? stat.num,
+      label: texts?.[`${field}Label`] ?? stat.label,
+    };
+  });
+
   return (
     <PageBg>
       <div style={{ position: "absolute", top: 56, left: 60, right: 60, textAlign: "center" }}>
-        <div className="smallcaps" style={{ fontSize: 11, color: "var(--ink-faded)", letterSpacing: ".5em" }}>contents</div>
+        <div className="smallcaps" style={{ fontSize: 11, color: "var(--ink-faded)", letterSpacing: ".5em" }}>{texts?.heading ?? "contents"}</div>
         <h3 className="f-display" style={{ fontSize: 44, fontStyle: "italic", margin: "8px 0 4px", color: "var(--ink)" }}>
-          The Whole Journey
+          {texts?.title ?? "The Whole Journey"}
         </h3>
         <Flourish width={160} color="#8b3a1e" style={{ display: "block", margin: "0 auto" }} />
       </div>
 
       <div style={{ position: "absolute", top: 170, left: 80, right: 80 }}>
-        {chapters.map((c, i) => (
+        {renderedChapters.map((c, i) => (
           <div
             key={i}
             style={{
@@ -71,7 +90,7 @@ export default function IndexPage({
           borderTop: "1px solid var(--ink-faded)",
         }}
       >
-        {stats.map((s, i) => (
+        {renderedStats.map((s, i) => (
           <div key={i} style={{ textAlign: "center" }}>
             <div className="f-display" style={{ fontSize: 32, fontStyle: "italic", color: "var(--terracotta-deep)", lineHeight: 1 }}>
               {s.num}
@@ -86,7 +105,7 @@ export default function IndexPage({
       <FernSprig size={50} rotate={-15} style={{ position: "absolute", top: 130, left: 30, opacity: 0.5 }} />
       <FernSprig size={50} rotate={15} style={{ position: "absolute", top: 130, right: 30, opacity: 0.5, transform: "scaleX(-1)" }} />
 
-      <div className="page-num" style={{ left: "50%", transform: "translateX(-50%)" }}>— iii —</div>
+      <div className="page-num" style={{ left: "50%", transform: "translateX(-50%)" }}>{texts?.pageNumber ?? "— iii —"}</div>
     </PageBg>
   );
 }

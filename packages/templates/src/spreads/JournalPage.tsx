@@ -13,6 +13,7 @@ export type JournalPageProps = {
   body2?: string | undefined;
   polaroidCaption?: string | undefined;
   signature?: string | undefined;
+  texts?: Record<string, string> | undefined;
 };
 
 export default function JournalPage({
@@ -26,12 +27,15 @@ export default function JournalPage({
   body2,
   polaroidCaption,
   signature,
+  texts,
 }: JournalPageProps): React.ReactElement {
   const bodyText =
     body ||
+    texts?.body ||
     "Today began before the sun did. We climbed Fushimi Inari while the gates were still wet from morning rain, and the foxes seemed to watch us from every shrine. M. counted 412 torii before she stopped counting. I lost count somewhere around the seventh switchback, when I sat on a stone bench and ate a peach so ripe it stained my journal. I have left the page in. It looks like a sunset.";
   const secondBodyText =
     body2 ||
+    texts?.body2 ||
     "We took the slow train back. A boy across the aisle offered me a paper crane. I am keeping it here, between this page and the next.";
 
   return (
@@ -77,10 +81,10 @@ export default function JournalPage({
         }}
       >
         <div className="f-script" style={{ fontSize: 22, color: "var(--ink-soft)", whiteSpace: "nowrap" }}>
-          {date || "Tuesday, the 16th"}
+          {date || texts?.date || "Tuesday, the 16th"}
         </div>
         <div className="f-mono" style={{ fontSize: 8, color: "var(--ink-faded)", letterSpacing: ".15em", whiteSpace: "nowrap" }}>
-          {weather || "FAIR & WINDY"}
+          {weather || texts?.weather || "FAIR & WINDY"}
         </div>
       </div>
 
@@ -88,7 +92,7 @@ export default function JournalPage({
         className="f-display"
         style={{ position: "absolute", top: 92, left: 80, fontSize: 28, fontStyle: "italic", color: "var(--terracotta-deep)" }}
       >
-        {location || "Kyoto, evening"}
+        {location || texts?.location || "Kyoto, evening"}
       </div>
 
       {/* journal text */}
@@ -109,7 +113,7 @@ export default function JournalPage({
         <div style={{ background: "#f7ecd4", padding: "8px 8px 22px", boxShadow: "0 8px 18px rgba(44,31,21,.2)", width: 130 }}>
           <Photo src={leftPhotoUrl} style={{ width: "100%", aspectRatio: 1 }} />
           <div className="f-script" style={{ position: "absolute", bottom: 4, left: 0, right: 0, textAlign: "center", fontSize: 13, color: "var(--ink-soft)" }}>
-            {polaroidCaption || "Fushimi"}
+            {polaroidCaption || texts?.polaroidCaption || "Fushimi"}
           </div>
         </div>
         {/* paperclip */}
@@ -131,12 +135,12 @@ export default function JournalPage({
 
       {/* signature */}
       <div style={{ position: "absolute", bottom: 60, right: 100 }}>
-        <div className="f-script" style={{ fontSize: 28, color: "var(--ink)", transform: "rotate(-4deg)" }}>{signature || "— E."}</div>
+        <div className="f-script" style={{ fontSize: 28, color: "var(--ink)", transform: "rotate(-4deg)" }}>{signature || texts?.signature || "-- E."}</div>
       </div>
 
-      <PassportStamp city="KYOTO" date="16·X·74" shape="circle" color="burgundy" rotate={12} style={{ position: "absolute", bottom: 130, left: 50 }} />
+      <PassportStamp city={texts?.stampCity || "KYOTO"} date={texts?.stampDate || "16·X·74"} shape="circle" color="burgundy" rotate={12} style={{ position: "absolute", bottom: 130, left: 50 }} />
 
-      <div className="page-num">— 41 —</div>
+      <div className="page-num">{texts?.pageNumber || "-- 41 --"}</div>
     </PageBg>
   );
 }

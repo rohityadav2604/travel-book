@@ -4,16 +4,17 @@ import { PassportStamp, Compass, Botanical } from "@memorybook/design/components
 
 export type InsideBackProps = {
   tripStats: { label: string; value: string }[] | undefined;
+  texts?: Record<string, string> | undefined;
 };
 
-export default function InsideBack({ tripStats }: InsideBackProps): React.ReactElement {
+export default function InsideBack({ tripStats, texts }: InsideBackProps): React.ReactElement {
   const stats = tripStats?.length
     ? tripStats
     : [
-        { label: "Countries", value: "11" },
-        { label: "Cities", value: "37" },
-        { label: "Days", value: "94" },
-        { label: "Photographs", value: "212" },
+        { label: texts?.stat1Label || "Countries", value: texts?.stat1Value || "11" },
+        { label: texts?.stat2Label || "Cities", value: texts?.stat2Value || "37" },
+        { label: texts?.stat3Label || "Days", value: texts?.stat3Value || "94" },
+        { label: texts?.stat4Label || "Photographs", value: texts?.stat4Value || "212" },
       ];
 
   return (
@@ -50,7 +51,7 @@ export default function InsideBack({ tripStats }: InsideBackProps): React.ReactE
         }}
       >
         <div className="smallcaps" style={{ fontSize: 11, color: "var(--ink-faded)", letterSpacing: "0.4em", marginBottom: 24 }}>
-          the journey in numbers
+          {texts?.heading || "the journey in numbers"}
         </div>
 
         <div
@@ -74,7 +75,7 @@ export default function InsideBack({ tripStats }: InsideBackProps): React.ReactE
         </div>
 
         <div style={{ marginTop: 40 }}>
-          <PassportStamp city="THE WORLD" date="MCMLXXIV" color="terra" rotate={6} />
+          <PassportStamp city={texts?.stampCity || "THE WORLD"} date={texts?.stampDate || "MCMLXXIV"} color="terra" rotate={6} />
         </div>
       </div>
 
@@ -87,7 +88,7 @@ export default function InsideBack({ tripStats }: InsideBackProps): React.ReactE
       </div>
 
       <div className="page-num" style={{ left: "50%", transform: "translateX(-50%)" }}>
-        — cvi —
+        {texts?.pageNumber || "-- cvi --"}
       </div>
     </PageBg>
   );

@@ -1,9 +1,10 @@
 import React from "react";
 export type ContactSheetProps = {
   photos: Array<{ url: string | undefined; caption?: string }>;
+  texts?: Record<string, string> | undefined;
 };
 
-export default function ContactSheet({ photos }: ContactSheetProps): React.ReactElement {
+export default function ContactSheet({ photos, texts }: ContactSheetProps): React.ReactElement {
   const gridPhotos = photos.slice(0, 9);
   const cols = 3;
   const rows = Math.ceil(gridPhotos.length / cols);
@@ -41,10 +42,10 @@ export default function ContactSheet({ photos }: ContactSheetProps): React.React
 
       {/* Film header */}
       <div className="f-mono" style={{ position: "absolute", top: 42, left: 28, fontSize: 9, letterSpacing: "0.15em", color: "rgba(243,231,209,.4)" }}>
-        KODAK TRI-X 400 · 36 EXP
+        {texts?.filmLabel || "KODAK TRI-X 400 · 36 EXP"}
       </div>
       <div className="f-mono" style={{ position: "absolute", top: 42, right: 28, fontSize: 9, letterSpacing: "0.15em", color: "rgba(243,231,209,.4)" }}>
-        ROLL 07
+        {texts?.rollLabel || "ROLL 07"}
       </div>
 
       {/* Photo grid */}

@@ -10,17 +10,26 @@ export type SinglePhotoPageProps = {
   caption?: string;
   location?: string;
   locationDate?: string;
+  texts?: Record<string, string> | undefined;
 };
 
 export default function SinglePhotoPage({
   photoUrl,
-  title = "A morning in Lisbon",
-  date = "JUL · 03",
-  time = "07:42",
-  caption = "The yellow tram woke me before the bells did. I sat on the windowsill with cold coffee and watched the city remember itself.",
-  location = "LISBOA",
-  locationDate = "03·VII·74",
+  title,
+  date,
+  time,
+  caption,
+  location,
+  locationDate,
+  texts,
 }: SinglePhotoPageProps): React.ReactElement {
+  const renderedTitle = title || texts?.title || "A morning in Lisbon";
+  const renderedDate = date || texts?.date || "JUL · 03";
+  const renderedTime = time || texts?.time || "07:42";
+  const renderedCaption = caption || texts?.caption || "The yellow tram woke me before the bells did. I sat on the windowsill with cold coffee and watched the city remember itself.";
+  const renderedLocation = location || texts?.location || "LISBOA";
+  const renderedLocationDate = locationDate || texts?.locationDate || "03·VII·74";
+
   return (
     <PageBg>
       <div style={{ position: "absolute", top: 60, left: 60, right: 60 }}>
@@ -28,7 +37,7 @@ export default function SinglePhotoPage({
           — observed —
         </div>
         <h3 className="f-display" style={{ fontSize: 38, fontStyle: "italic", textAlign: "center", margin: "8px 0 4px", color: "var(--ink)" }}>
-          {title}
+          {renderedTitle}
         </h3>
         <Flourish width={80} color="#8b3a1e" style={{ display: "block", margin: "0 auto" }} />
       </div>
@@ -52,17 +61,17 @@ export default function SinglePhotoPage({
 
       <div style={{ position: "absolute", left: 80, right: 80, bottom: 90, display: "flex", gap: 24, alignItems: "flex-start" }}>
         <div style={{ flex: "0 0 auto", width: 80 }}>
-          <div className="f-mono" style={{ fontSize: 11, color: "var(--ink-faded)", letterSpacing: ".15em" }}>{date}</div>
-          <div className="f-mono" style={{ fontSize: 9, color: "var(--ink-faded)", letterSpacing: ".15em", marginTop: 2 }}>{time}</div>
+          <div className="f-mono" style={{ fontSize: 11, color: "var(--ink-faded)", letterSpacing: ".15em" }}>{renderedDate}</div>
+          <div className="f-mono" style={{ fontSize: 9, color: "var(--ink-faded)", letterSpacing: ".15em", marginTop: 2 }}>{renderedTime}</div>
         </div>
         <div style={{ flex: 1, borderLeft: "1px solid var(--ink-faded)", paddingLeft: 24, opacity: 0.9 }}>
           <p className="f-script" style={{ fontSize: 22, lineHeight: 1.35, margin: 0, color: "var(--ink-soft)" }}>
-            {caption}
+            {renderedCaption}
           </p>
         </div>
       </div>
 
-      <PassportStamp city={location} date={locationDate} color="terra" rotate={8} style={{ position: "absolute", top: 200, right: 28 }} />
+      <PassportStamp city={renderedLocation} date={renderedLocationDate} color="terra" rotate={8} style={{ position: "absolute", top: 200, right: 28 }} />
 
       <div className="page-num">— 27 —</div>
     </PageBg>

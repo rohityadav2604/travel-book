@@ -5,12 +5,14 @@ export type HeroFocusProps = {
   photoUrl: string | undefined;
   caption?: string | undefined;
   subtitle?: string | undefined;
+  texts?: Record<string, string> | undefined;
 };
 
 export default function HeroFocus({
   photoUrl,
   caption,
-  subtitle = "— the journey continues —",
+  subtitle,
+  texts,
 }: HeroFocusProps): React.ReactElement {
   return (
     <PageBg>
@@ -76,9 +78,9 @@ export default function HeroFocus({
             marginBottom: 6,
           }}
         >
-          {subtitle}
+          {subtitle || texts?.subtitle || "-- the journey continues --"}
         </div>
-        {caption && (
+        {(caption || texts?.caption) && (
           <div
             className="f-display"
             style={{
@@ -88,7 +90,7 @@ export default function HeroFocus({
               color: "#2c1f15",
             }}
           >
-            {caption}
+            {caption || texts?.caption}
           </div>
         )}
       </div>
@@ -98,7 +100,7 @@ export default function HeroFocus({
         className="page-num"
         style={{ color: "rgba(74,53,38,0.45)" }}
       >
-        —
+        {texts?.pageNumber || "--"}
       </div>
     </PageBg>
   );

@@ -1,6 +1,16 @@
 import React from "react";
 
-export default function CityCover({ heroUrl, title, date }: { heroUrl?: string | undefined; title?: string | undefined; date?: string | undefined }): React.ReactElement {
+export default function CityCover({
+  heroUrl,
+  title,
+  date,
+  texts,
+}: {
+  heroUrl?: string | undefined;
+  title?: string | undefined;
+  date?: string | undefined;
+  texts?: Record<string, string> | undefined;
+}): React.ReactElement {
   return (
     <div className="relative h-full w-full overflow-hidden" style={{ background: "#1c2025" }}>
       {heroUrl ? (
@@ -13,14 +23,14 @@ export default function CityCover({ heroUrl, title, date }: { heroUrl?: string |
       )}
       <div className="absolute inset-0 flex flex-col items-center justify-center px-8" style={{ textAlign: "center" }}>
         <div style={{ fontFamily: "'Inter Tight', sans-serif", fontSize: 10, letterSpacing: ".35em", textTransform: "uppercase", color: "#00d4aa", marginBottom: 20 }}>
-          Travel Book
+          {texts?.eyebrow || "Travel Book"}
         </div>
         <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 48, fontWeight: 300, fontStyle: "italic", lineHeight: 1.1, color: "#e0e2e5" }}>
-          {title || "City Lights"}
+          {title || texts?.title || "City Lights"}
         </h1>
-        {date && (
+        {(date || texts?.date) && (
           <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: ".15em", color: "#6b7580", marginTop: 16 }}>
-            {date}
+            {date || texts?.date}
           </p>
         )}
       </div>

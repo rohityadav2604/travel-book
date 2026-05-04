@@ -4,16 +4,16 @@ import { Flourish, CoffeeStain, Stamp, Ticket } from "@memorybook/design/compone
 
 export type EphemeraProps = {
   photos: (string | undefined)[];
+  texts?: Record<string, string> | undefined;
 };
 
-export default function Ephemera(_props: EphemeraProps): React.ReactElement {
-  void _props;
+export default function Ephemera({ texts }: EphemeraProps): React.ReactElement {
   return (
     <PageBg>
       <div style={{ position: "absolute", top: 50, left: 60, right: 60 }}>
-        <div className="smallcaps" style={{ fontSize: 10, color: "var(--ink-faded)" }}>kept & collected</div>
+        <div className="smallcaps" style={{ fontSize: 10, color: "var(--ink-faded)" }}>{texts?.eyebrow || "kept & collected"}</div>
         <h3 className="f-display" style={{ fontSize: 38, fontStyle: "italic", margin: "4px 0 0", color: "var(--ink)" }}>
-          Things from pockets
+          {texts?.title || "Things from pockets"}
         </h3>
         <Flourish width={140} color="#8b3a1e" style={{ marginTop: 12 }} />
       </div>
@@ -24,7 +24,7 @@ export default function Ephemera(_props: EphemeraProps): React.ReactElement {
 
       {/* ticket 1 */}
       <div style={{ position: "absolute", top: 150, left: 60, transform: "rotate(-3deg)", width: 320 }}>
-        <Ticket from="LONDON" to="PARIS" date="22·IX·74" seat="14B" />
+        <Ticket from={texts?.ticketFrom || "LONDON"} to={texts?.ticketTo || "PARIS"} date={texts?.ticketDate || "22·IX·74"} seat={texts?.ticketSeat || "14B"} />
       </div>
 
       {/* boarding pass-style */}
@@ -42,21 +42,21 @@ export default function Ephemera(_props: EphemeraProps): React.ReactElement {
         }}
       >
         <div className="f-mono" style={{ fontSize: 8, color: "var(--ink-faded)", letterSpacing: "0.2em", borderBottom: "1px dashed #6b4f3a", paddingBottom: 5 }}>
-          BOARDING PASS · 1stCLASS
+          {texts?.boardingHeader || "BOARDING PASS · 1stCLASS"}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
           <div>
-            <div className="f-mono" style={{ fontSize: 7, color: "var(--ink-faded)" }}>FROM</div>
-            <div className="f-display" style={{ fontSize: 20, color: "var(--ink)" }}>CDG</div>
+            <div className="f-mono" style={{ fontSize: 7, color: "var(--ink-faded)" }}>{texts?.fromLabel || "FROM"}</div>
+            <div className="f-display" style={{ fontSize: 20, color: "var(--ink)" }}>{texts?.fromCode || "CDG"}</div>
           </div>
           <div style={{ alignSelf: "center", color: "var(--terracotta)", fontSize: 18 }}>→</div>
           <div>
-            <div className="f-mono" style={{ fontSize: 7, color: "var(--ink-faded)" }}>TO</div>
-            <div className="f-display" style={{ fontSize: 20, color: "var(--ink)" }}>FCO</div>
+            <div className="f-mono" style={{ fontSize: 7, color: "var(--ink-faded)" }}>{texts?.toLabel || "TO"}</div>
+            <div className="f-display" style={{ fontSize: 20, color: "var(--ink)" }}>{texts?.toCode || "FCO"}</div>
           </div>
         </div>
         <div className="f-mono" style={{ fontSize: 8, color: "var(--ink-soft)", marginTop: 6, letterSpacing: "0.15em" }}>
-          FLT AZ-414 · 14:20 · GATE B7
+          {texts?.flightInfo || "FLT AZ-414 · 14:20 · GATE B7"}
         </div>
       </div>
 
@@ -74,15 +74,15 @@ export default function Ephemera(_props: EphemeraProps): React.ReactElement {
         }}
       >
         <div style={{ border: "1px solid #8b3a1e", padding: 10, position: "relative" }}>
-          <div className="f-display" style={{ fontSize: 16, fontStyle: "italic", color: "var(--terracotta-deep)" }}>Greetings from Paris</div>
+          <div className="f-display" style={{ fontSize: 16, fontStyle: "italic", color: "var(--terracotta-deep)" }}>{texts?.postcardTitle || "Greetings from Paris"}</div>
           <div className="f-script" style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 4, lineHeight: 1.3, paddingRight: 56 }}>
-            The cafés are exactly as small & perfect as you said. I have eaten my weight in croissants. Wish you were here.
+            {texts?.postcardBody || "The cafés are exactly as small & perfect as you said. I have eaten my weight in croissants. Wish you were here."}
           </div>
           <div className="f-script" style={{ fontSize: 14, color: "var(--ink)", marginTop: 4, textAlign: "right" }}>
-            — love, A.
+            {texts?.postcardSignature || "-- love, A."}
           </div>
           <div style={{ position: "absolute", top: 8, right: 8 }}>
-            <Stamp country="FRANCE" value="0,80F" color="terra" />
+            <Stamp country={texts?.stampCountry || "FRANCE"} value={texts?.stampValue || "0,80F"} color="terra" />
           </div>
         </div>
       </div>
@@ -92,13 +92,13 @@ export default function Ephemera(_props: EphemeraProps): React.ReactElement {
         <circle cx="40" cy="40" r="32" fill="#c89441" opacity="0.7" stroke="#8b3a1e" strokeWidth="1" />
         <circle cx="40" cy="40" r="26" fill="none" stroke="#8b3a1e" strokeWidth="0.6" opacity="0.8" />
         <text x="40" y="32" textAnchor="middle" fontSize="8" fill="#3a2a1c" fontFamily="Cormorant SC, serif" letterSpacing="1">
-          REPVBLICA
+          {texts?.coinTop || "REPVBLICA"}
         </text>
         <text x="40" y="48" textAnchor="middle" fontSize="14" fill="#3a2a1c" fontFamily="DM Serif Display, serif">
-          100
+          {texts?.coinValue || "100"}
         </text>
         <text x="40" y="60" textAnchor="middle" fontSize="6" fill="#3a2a1c" fontFamily="Cormorant SC, serif" letterSpacing="1">
-          LIRE
+          {texts?.coinBottom || "LIRE"}
         </text>
       </svg>
 
@@ -117,15 +117,15 @@ export default function Ephemera(_props: EphemeraProps): React.ReactElement {
           boxShadow: "0 6px 14px rgba(0,0,0,.25)",
         }}
       >
-        <div className="f-display" style={{ fontSize: 12, fontStyle: "italic", lineHeight: 1 }}>Caffè</div>
-        <div className="f-display" style={{ fontSize: 14, fontStyle: "italic", lineHeight: 1 }}>Trastevere</div>
+        <div className="f-display" style={{ fontSize: 12, fontStyle: "italic", lineHeight: 1 }}>{texts?.matchbookLine1 || "Caffè"}</div>
+        <div className="f-display" style={{ fontSize: 14, fontStyle: "italic", lineHeight: 1 }}>{texts?.matchbookLine2 || "Trastevere"}</div>
         <div className="f-mono" style={{ fontSize: 6, letterSpacing: "0.15em", marginTop: 4, opacity: 0.8 }}>
-          EST. 1894 · ROMA
+          {texts?.matchbookLine3 || "EST. 1894 · ROMA"}
         </div>
       </div>
 
       <div className="page-num" style={{ left: "50%", transform: "translateX(-50%)" }}>
-        — 56 —
+        {texts?.pageNumber || "-- 56 --"}
       </div>
     </PageBg>
   );

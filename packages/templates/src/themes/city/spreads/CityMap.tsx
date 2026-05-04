@@ -1,6 +1,14 @@
 import React from "react";
 
-export default function CityMap({ photoUrl, caption }: { photoUrl?: string | undefined; caption?: string | undefined }): React.ReactElement {
+export default function CityMap({
+  photoUrl,
+  caption,
+  texts,
+}: {
+  photoUrl?: string | undefined;
+  caption?: string | undefined;
+  texts?: Record<string, string> | undefined;
+}): React.ReactElement {
   return (
     <div className="relative h-full w-full overflow-hidden" style={{ background: "#1c2025" }}>
       <div className="absolute inset-0" style={{ background: "repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,212,170,0.06) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,212,170,0.06) 40px)" }} />
@@ -10,9 +18,9 @@ export default function CityMap({ photoUrl, caption }: { photoUrl?: string | und
         </div>
       )}
       <div className="absolute bottom-0 left-0 right-0 px-8 pb-8">
-        {caption && (
+        {(caption || texts?.caption) && (
           <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, letterSpacing: ".15em", textTransform: "uppercase", color: "#00d4aa" }}>
-            {caption}
+            {caption || texts?.caption}
           </p>
         )}
       </div>

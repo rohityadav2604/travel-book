@@ -7,6 +7,7 @@ export type GalleryDuoProps = {
   leftCaption?: string | undefined;
   rightCaption?: string | undefined;
   title?: string | undefined;
+  texts?: Record<string, string> | undefined;
 };
 
 export default function GalleryDuo({
@@ -14,7 +15,8 @@ export default function GalleryDuo({
   rightUrl,
   leftCaption,
   rightCaption,
-  title = "Side by Side",
+  title,
+  texts,
 }: GalleryDuoProps): React.ReactElement {
   return (
     <PageBg>
@@ -36,7 +38,7 @@ export default function GalleryDuo({
             letterSpacing: "0.4em",
           }}
         >
-          {title}
+          {title || texts?.title || "Side by Side"}
         </div>
       </div>
 
@@ -112,7 +114,7 @@ export default function GalleryDuo({
           textAlign: "center",
         }}
       >
-        {leftCaption && (
+        {(leftCaption || texts?.left) && (
           <div
             className="f-script"
             style={{
@@ -120,7 +122,7 @@ export default function GalleryDuo({
               color: "rgba(44,31,21,.75)",
             }}
           >
-            {leftCaption}
+            {leftCaption || texts?.left}
           </div>
         )}
       </div>
@@ -133,7 +135,7 @@ export default function GalleryDuo({
           textAlign: "center",
         }}
       >
-        {rightCaption && (
+        {(rightCaption || texts?.right) && (
           <div
             className="f-script"
             style={{
@@ -141,7 +143,7 @@ export default function GalleryDuo({
               color: "rgba(44,31,21,.75)",
             }}
           >
-            {rightCaption}
+            {rightCaption || texts?.right}
           </div>
         )}
       </div>
@@ -151,7 +153,7 @@ export default function GalleryDuo({
         className="page-num"
         style={{ color: "rgba(74,53,38,0.45)" }}
       >
-        —
+        {texts?.pageNumber || "--"}
       </div>
     </PageBg>
   );

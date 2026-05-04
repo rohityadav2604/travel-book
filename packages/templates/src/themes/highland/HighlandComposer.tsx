@@ -17,10 +17,10 @@ function opt<T>(value: T | undefined): T | undefined {
 export default function HighlandComposer({ templateName, slots, captions = undefined }: SpreadComposerProps): React.ReactElement {
   switch (templateName) {
     case "HighlandCover":
-      return <HighlandCover heroUrl={slots.hero} title={opt(captions?.title)} date={opt(captions?.date)} />;
+      return <HighlandCover heroUrl={slots.hero} title={opt(captions?.title)} date={opt(captions?.date)} texts={captions} />;
 
     case "HighlandHero":
-      return <HighlandHero photoUrl={slots.hero} caption={opt(captions?.caption || captions?.hero)} subtitle={opt(captions?.subtitle)} />;
+      return <HighlandHero photoUrl={slots.hero} caption={opt(captions?.caption || captions?.hero)} subtitle={opt(captions?.subtitle)} texts={captions} />;
 
     case "HighlandGrid": {
       const pgProps: {
@@ -28,8 +28,10 @@ export default function HighlandComposer({ templateName, slots, captions = undef
         heroCaption?: string;
         smallPhotos: Array<{ url: string | undefined; caption?: string }>;
         title?: string;
+        texts?: Record<string, string> | undefined;
       } = {
         heroUrl: slots.hero || slots.left,
+        texts: captions,
         smallPhotos: [
           { url: slots.topRight, ...(captions?.topRight ? { caption: captions.topRight } : {}) },
           { url: slots.bottomRight, ...(captions?.bottomRight ? { caption: captions.bottomRight } : {}) },
@@ -49,14 +51,15 @@ export default function HighlandComposer({ templateName, slots, captions = undef
           bottomRightPhotoUrl={slots.bottomRight}
           quote={opt(captions?.quote)}
           date={opt(captions?.date)}
+          texts={captions}
         />
       );
 
     case "HighlandQuote":
-      return <HighlandQuote quote={opt(captions?.quote)} caption={opt(captions?.caption)} />;
+      return <HighlandQuote quote={opt(captions?.quote)} caption={opt(captions?.caption)} texts={captions} />;
 
     case "HighlandBackCover":
-      return <HighlandBackCover brand={opt(captions?.brand)} />;
+      return <HighlandBackCover brand={opt(captions?.brand)} texts={captions} />;
 
     case "MosaicGrid": {
       const mosaicPhotos = Object.entries(slots).map(([k, url]) => {

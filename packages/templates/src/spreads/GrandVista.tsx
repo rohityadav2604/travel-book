@@ -5,9 +5,10 @@ export type GrandVistaProps = {
   photoUrl: string | undefined;
   caption: string | undefined;
   subtitle?: string | undefined;
+  texts?: Record<string, string> | undefined;
 };
 
-export default function GrandVista({ photoUrl, caption, subtitle }: GrandVistaProps): React.ReactElement {
+export default function GrandVista({ photoUrl, caption, subtitle, texts }: GrandVistaProps): React.ReactElement {
   return (
     <PageBg>
       <Photo src={photoUrl} style={{ position: "absolute", inset: 0 }} />
@@ -67,13 +68,13 @@ export default function GrandVista({ photoUrl, caption, subtitle }: GrandVistaPr
       {/* caption block */}
       <div style={{ position: "absolute", left: 56, right: 56, bottom: 56, color: "#f3e7d1" }}>
         <div className="smallcaps" style={{ fontSize: 11, opacity: 0.8, letterSpacing: "0.4em" }}>
-          plate xiv
+          {texts?.plate || "plate xiv"}
         </div>
         <h2 className="f-display" style={{ fontSize: 52, lineHeight: 1, margin: "10px 0 8px", fontStyle: "italic" }}>
-          {caption || "The first sight of the sea"}
+          {caption || texts?.hero || "The first sight of the sea"}
         </h2>
         <div className="f-script" style={{ fontSize: 26, opacity: 0.92 }}>
-          {subtitle || "— somewhere south of here, dawn —"}
+          {subtitle || texts?.subtitle || "-- somewhere south of here, dawn --"}
         </div>
       </div>
 
@@ -81,7 +82,7 @@ export default function GrandVista({ photoUrl, caption, subtitle }: GrandVistaPr
         className="page-num"
         style={{ left: "50%", transform: "translateX(-50%)", color: "#f3e7d1", opacity: 0.6 }}
       >
-        14
+        {texts?.pageNumber || "14"}
       </div>
     </PageBg>
   );

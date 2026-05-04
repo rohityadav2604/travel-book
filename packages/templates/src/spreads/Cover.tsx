@@ -6,9 +6,10 @@ export type CoverProps = {
   heroUrl: string | undefined;
   title: string | undefined;
   date: string | undefined;
+  texts?: Record<string, string> | undefined;
 };
 
-export default function Cover({ heroUrl, title, date }: CoverProps): React.ReactElement {
+export default function Cover({ heroUrl, title, date, texts }: CoverProps): React.ReactElement {
   return (
     <PageBg>
       {heroUrl && <Photo src={heroUrl} style={{ position: "absolute", inset: 0 }} />}
@@ -58,7 +59,7 @@ export default function Cover({ heroUrl, title, date }: CoverProps): React.React
         }}
       >
         <div className="smallcaps" style={{ fontSize: 13, color: "var(--terracotta-deep)", marginBottom: 24 }}>
-          — A Travelogue —
+          {texts?.kicker || "-- A Travelogue --"}
         </div>
         <Flourish width={180} color="#8b3a1e" />
         <h1
@@ -79,9 +80,12 @@ export default function Cover({ heroUrl, title, date }: CoverProps): React.React
         </div>
         <Flourish width={180} color="#8b3a1e" style={{ marginTop: 28 }} />
         <div className="smallcaps" style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 32, lineHeight: 1.8 }}>
-          Photographs · Letters · Maps
-          <br />
-          Volume One · Summer Editions
+          {(texts?.contents || "Photographs · Letters · Maps\nVolume One · Summer Editions").split("\n").map((line) => (
+            <React.Fragment key={line}>
+              {line}
+              <br />
+            </React.Fragment>
+          ))}
         </div>
       </div>
 
@@ -127,7 +131,7 @@ export default function Cover({ heroUrl, title, date }: CoverProps): React.React
           color: "var(--ink-faded)",
         }}
       >
-        Property of the Wanderer
+        {texts?.property || "Property of the Wanderer"}
       </div>
     </PageBg>
   );

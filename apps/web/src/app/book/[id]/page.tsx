@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { getTemplateTextFields, resolveTemplateTextValue } from "@memorybook/templates";
 import SpreadComposer from "@memorybook/templates/SpreadComposer";
 import { imageUrl } from "@/lib/imageUrl";
 
@@ -40,265 +41,9 @@ type SelectedSlot = {
   slotId: string;
 };
 
-type EditableTextField = {
-  key: string;
-  label: string;
-  placeholder?: string;
-  multiline?: boolean;
-};
-
 type UsedPhotoLocation = SelectedSlot & {
   spreadLabel: string;
 };
-
-const TEMPLATE_TEXT_FIELDS: Record<string, EditableTextField[]> = {
-  Cover: [
-    { key: "title", label: "Title", placeholder: "Untitled Travel Book" },
-    { key: "date", label: "Date", placeholder: "Summer 2026" },
-  ],
-  InsideFront: [{ key: "quote", label: "Opening quote", multiline: true }],
-  ChapterDivider: [{ key: "label", label: "Chapter label", placeholder: "Chapter" }],
-  GrandVista: [
-    { key: "hero", label: "Hero caption", placeholder: "The first sight of the sea" },
-    { key: "subtitle", label: "Subtitle" },
-  ],
-  JournalPage: [
-    { key: "date", label: "Date" },
-    { key: "weather", label: "Weather" },
-    { key: "location", label: "Location" },
-    { key: "body", label: "Journal text", multiline: true },
-    { key: "body2", label: "Second paragraph", multiline: true },
-    { key: "polaroidCaption", label: "Pinned photo caption" },
-    { key: "signature", label: "Signature" },
-  ],
-  MapPage: [{ key: "caption", label: "Map caption" }],
-  QuotePage: [
-    { key: "quote", label: "Quote", multiline: true },
-    { key: "caption", label: "Attribution" },
-  ],
-  BackCover: [{ key: "brand", label: "Back cover mark" }],
-  SinglePhotoPage: [
-    { key: "title", label: "Title" },
-    { key: "date", label: "Date" },
-    { key: "caption", label: "Caption", multiline: true },
-  ],
-  PhotoJournal: [{ key: "title", label: "Title" }],
-  HeroFocus: [
-    { key: "caption", label: "Caption", multiline: true },
-    { key: "subtitle", label: "Subtitle" },
-  ],
-  GalleryDuo: [
-    { key: "title", label: "Title" },
-    { key: "left", label: "Left caption" },
-    { key: "right", label: "Right caption" },
-  ],
-  StorySpread: [
-    { key: "title", label: "Title" },
-    { key: "body", label: "Story text", multiline: true },
-    { key: "author", label: "Author" },
-    { key: "date", label: "Date" },
-  ],
-  GroupPhotoSpread: [
-    { key: "caption", label: "Caption", multiline: true },
-    { key: "subtitle", label: "Subtitle" },
-  ],
-  HighlandCover: [
-    { key: "title", label: "Title", placeholder: "Untitled Travel Book" },
-    { key: "date", label: "Date", placeholder: "Summer 2026" },
-  ],
-  HighlandHero: [
-    { key: "caption", label: "Caption", multiline: true },
-    { key: "subtitle", label: "Subtitle" },
-  ],
-  HighlandGrid: [
-    { key: "title", label: "Title" },
-    { key: "hero", label: "Hero caption" },
-    { key: "topRight", label: "Top right caption" },
-    { key: "bottomRight", label: "Bottom right caption" },
-  ],
-  HighlandJournal: [
-    { key: "quote", label: "Journal quote", multiline: true },
-    { key: "date", label: "Date" },
-  ],
-  HighlandQuote: [
-    { key: "quote", label: "Quote", multiline: true },
-    { key: "caption", label: "Attribution" },
-  ],
-  HighlandBackCover: [{ key: "brand", label: "Back cover mark" }],
-  CityCover: [
-    { key: "title", label: "Title", placeholder: "Untitled Travel Book" },
-    { key: "date", label: "Date", placeholder: "Summer 2026" },
-  ],
-  CityHero: [
-    { key: "caption", label: "Caption", multiline: true },
-    { key: "subtitle", label: "Subtitle" },
-  ],
-  CityMap: [{ key: "caption", label: "Map caption" }],
-};
-
-const TEMPLATE_TEXT_DEFAULTS: Record<string, Record<string, string>> = {
-  Cover: {
-    title: "Wanderbound",
-    date: "& other small adventures",
-  },
-  InsideFront: {
-    quote: "The world is a book, and those who do not travel read only one page.",
-  },
-  ChapterDivider: {
-    label: "Chapter",
-  },
-  GrandVista: {
-    hero: "The first sight of the sea",
-    subtitle: "— somewhere south of here, dawn —",
-  },
-  JournalPage: {
-    date: "Tuesday, the 16th",
-    weather: "FAIR & WINDY",
-    location: "Kyoto, evening",
-    body: "Today began before the sun did. We climbed Fushimi Inari while the gates were still wet from morning rain, and the foxes seemed to watch us from every shrine. M. counted 412 torii before she stopped counting. I lost count somewhere around the seventh switchback, when I sat on a stone bench and ate a peach so ripe it stained my journal. I have left the page in. It looks like a sunset.",
-    body2: "We took the slow train back. A boy across the aisle offered me a paper crane. I am keeping it here, between this page and the next.",
-    polaroidCaption: "Fushimi",
-    signature: "— E.",
-  },
-  MapPage: {
-    caption: "The Route",
-  },
-  QuotePage: {
-    quote: "Not all those who wander\nare lost — some of us\nare simply taking the long way home.",
-    caption: "— found in a guesthouse in Hanoi",
-  },
-  BackCover: {
-    brand: "Wanderbound",
-  },
-  SinglePhotoPage: {
-    title: "A morning in Lisbon",
-    date: "JUL · 03",
-    caption: "The yellow tram woke me before the bells did. I sat on the windowsill with cold coffee and watched the city remember itself.",
-  },
-  PhotoGrid: {
-    title: "A week in Marrakesh",
-    date: "IV · MMXXIV",
-    hero: "the souk at dusk",
-  },
-  PhotoJournal: {
-    title: "The drive to Provence",
-  },
-  HeroFocus: {
-    subtitle: "— the journey continues —",
-  },
-  GalleryDuo: {
-    title: "Side by Side",
-  },
-  StorySpread: {
-    title: "The Road Behind & Ahead",
-    body:
-      "Every journey leaves marks that maps cannot capture. The laughter shared over a missed train, the silence of a sunrise that no camera could hold, the strangers who became friends before a single name was exchanged.\n\n" +
-      "This book is a tribute to those fragments — the moments between the plans, the beauty between the borders, the stories that unfolded when we let the world lead the way.\n\n" +
-      "Wherever the next path begins, these pages will remind us that the best part of travel is not the destination, but the company we keep along the way.",
-  },
-  HighlandCover: {
-    title: "Highland",
-    date: "NOTES FROM THE QUIET COUNTRY",
-  },
-  HighlandHero: {
-    caption: "The river falls without ceremony.",
-    subtitle: "— north face, before the rain",
-  },
-  HighlandGrid: {
-    title: "Five days in the pines",
-  },
-  HighlandJournal: {
-    quote: "Crossed the saddle in low cloud. The cairns kept their distance and the wind kept ours.",
-    date: "OCT · 18 · 14h 06",
-  },
-  HighlandQuote: {
-    quote: "We climb not to leave the world, but to look at it from a quieter window.",
-    caption: "— from the cabin journal",
-  },
-  HighlandBackCover: {
-    brand: "Highland",
-  },
-  CityCover: {
-    title: "City Lights",
-  },
-};
-
-const SLOT_CAPTION_TEMPLATES = new Set([
-  "PolaroidWall",
-  "GoldenHour",
-  "ContactSheet",
-  "MosaicGrid",
-  "PhotoGrid",
-  "PhotoJournal",
-]);
-
-function humanizeKey(key: string): string {
-  return key
-    .replace(/-/g, " ")
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-function textField(key: string, label?: string): EditableTextField {
-  return { key, label: label ?? humanizeKey(key), multiline: key === "quote" || key === "body" || key === "caption" };
-}
-
-function getEditableTextFields(
-  templateName: string,
-  slotIds: string[],
-  existingTexts: Record<string, string> | undefined,
-): EditableTextField[] {
-  const fields = [...(TEMPLATE_TEXT_FIELDS[templateName] ?? [])];
-
-  if (SLOT_CAPTION_TEMPLATES.has(templateName)) {
-    const captionSlotIds = templateName === "GoldenHour" ? slotIds.filter((id) => id.startsWith("right")) : slotIds;
-    fields.push(...captionSlotIds.map((id) => textField(id, `${humanizeKey(id)} caption`)));
-  }
-
-  fields.push({ key: "note", label: "Additional note", multiline: true });
-
-  const seen = new Set(fields.map((field) => field.key));
-  for (const key of Object.keys(existingTexts ?? {})) {
-    if (!seen.has(key)) {
-      fields.push(textField(key));
-      seen.add(key);
-    }
-  }
-
-  return fields;
-}
-
-function getAssignedPhotoCaption(
-  spread: SpreadData | undefined,
-  slotId: string,
-  photoMap: Map<string, PhotoItem>,
-): string | undefined {
-  const assignment = spread?.assignments.find((item) => item.slotId === slotId);
-  if (!assignment) return undefined;
-  const caption = photoMap.get(assignment.photoId)?.caption;
-  return caption || undefined;
-}
-
-function getRenderedTextValue(
-  spread: SpreadData | undefined,
-  field: EditableTextField,
-  photoMap: Map<string, PhotoItem>,
-): string {
-  if (!spread) return "";
-
-  const explicit = spread.texts?.[field.key];
-  if (explicit !== undefined) return explicit;
-
-  if (field.key === "caption") {
-    const heroCaption = spread.texts?.hero ?? getAssignedPhotoCaption(spread, "hero", photoMap);
-    if (heroCaption) return heroCaption;
-  }
-
-  const directPhotoCaption = getAssignedPhotoCaption(spread, field.key, photoMap);
-  if (directPhotoCaption) return directPhotoCaption;
-
-  return TEMPLATE_TEXT_DEFAULTS[spread.templateName]?.[field.key] ?? "";
-}
 
 function ScaledPage({ children }: { children: React.ReactNode }): React.ReactElement {
   const ref = useRef<HTMLDivElement>(null);
@@ -412,7 +157,7 @@ function EditSidebar({
   const selectedPhoto = selectedPhotoId ? photoMap.get(selectedPhotoId) : undefined;
   const editableTextFields = useMemo(
     () =>
-      getEditableTextFields(
+      getTemplateTextFields(
         currentSpread?.templateName ?? "",
         slotList.map((slot) => slot.id),
         currentSpread?.texts,
@@ -563,7 +308,14 @@ function EditSidebar({
             {editableTextFields.length > 0 ? (
               <div className="space-y-3">
                 {editableTextFields.map((field) => {
-                  const value = getRenderedTextValue(currentSpread, field, photoMap);
+                  const value = currentSpread
+                    ? resolveTemplateTextValue({
+                        assignments: currentSpread.assignments,
+                        field,
+                        getPhotoCaption: (photoId) => photoMap.get(photoId)?.caption,
+                        texts: currentSpread.texts,
+                      })
+                    : "";
                   return (
                     <div key={field.key}>
                       <label className="block font-mono text-[9px] uppercase tracking-wider text-ink-faded/70">{field.label}</label>
@@ -571,7 +323,7 @@ function EditSidebar({
                         <textarea
                           value={value}
                           onChange={(e) => onUpdateText(currentIdx, field.key, e.target.value)}
-                          placeholder={field.placeholder}
+                          placeholder={field.defaultValue}
                           rows={3}
                           className="mt-1 w-full resize-none rounded border border-ink-faded/20 bg-paper px-3 py-2 font-serif text-sm leading-snug text-ink placeholder:text-ink-faded/40 focus:border-terracotta-deep focus:outline-none"
                         />
@@ -580,7 +332,7 @@ function EditSidebar({
                           type="text"
                           value={value}
                           onChange={(e) => onUpdateText(currentIdx, field.key, e.target.value)}
-                          placeholder={field.placeholder}
+                          placeholder={field.defaultValue}
                           className="mt-1 w-full rounded border border-ink-faded/20 bg-paper px-3 py-2 font-script text-sm text-ink placeholder:text-ink-faded/40 focus:border-terracotta-deep focus:outline-none"
                         />
                       )}

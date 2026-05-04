@@ -6,9 +6,10 @@ export type HighlandCoverProps = {
   heroUrl: string | undefined;
   title: string | undefined;
   date: string | undefined;
+  texts?: Record<string, string> | undefined;
 };
 
-export default function HighlandCover({ heroUrl, title, date }: HighlandCoverProps): React.ReactElement {
+export default function HighlandCover({ heroUrl, title, date, texts }: HighlandCoverProps): React.ReactElement {
   return (
     <HPageBg variant="dark">
       {heroUrl && <HPhoto src={heroUrl} style={{ position: "absolute", inset: 0, opacity: 0.55 }} />}
@@ -23,7 +24,7 @@ export default function HighlandCover({ heroUrl, title, date }: HighlandCoverPro
 
       <div style={{ position: "absolute", top: 60, left: 0, right: 0, textAlign: "center" }}>
         <div className="m-caps" style={{ color: "#b8c2a3", fontSize: 10 }}>
-          VOL · II &nbsp; / &nbsp; A FIELD GUIDE
+          {texts?.volumeLabel || "VOL · II / A FIELD GUIDE"}
         </div>
       </div>
 
@@ -39,19 +40,19 @@ export default function HighlandCover({ heroUrl, title, date }: HighlandCoverPro
             fontStyle: "italic",
           }}
         >
-          {title || "Highland"}
+          {title || texts?.title || "Highland"}
         </h1>
         <div className="m-caps" style={{ marginTop: 16, fontSize: 10, color: "#b8c2a3", letterSpacing: ".5em" }}>
-          {date || "NOTES FROM THE QUIET COUNTRY"}
+          {date || texts?.date || "NOTES FROM THE QUIET COUNTRY"}
         </div>
       </div>
 
       <div style={{ position: "absolute", bottom: 60, left: 0, right: 0, textAlign: "center", color: "#b8c2a3" }}>
         <div className="m-mono" style={{ fontSize: 10, letterSpacing: ".25em" }}>
-          47°.32′N &nbsp; · &nbsp; 11°.84′E
+          {texts?.coords || "47°.32′N · 11°.84′E"}
         </div>
         <div className="m-mono" style={{ fontSize: 9, letterSpacing: ".2em", marginTop: 6, opacity: 0.7 }}>
-          OCT — NOV &nbsp; · &nbsp; MMXXIV
+          {texts?.season || "OCT -- NOV · MMXXIV"}
         </div>
       </div>
 

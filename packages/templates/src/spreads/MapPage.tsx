@@ -5,9 +5,10 @@ import { Compass, HandDrawnMap, Tape, PassportStamp, Botanical } from "@memorybo
 export type MapPageProps = {
   photoUrl: string | undefined;
   caption: string | undefined;
+  texts?: Record<string, string> | undefined;
 };
 
-export default function MapPage({ caption }: MapPageProps): React.ReactElement {
+export default function MapPage({ caption, texts }: MapPageProps): React.ReactElement {
   return (
     <PageBg>
       {/* faint grid like old atlas */}
@@ -34,9 +35,9 @@ export default function MapPage({ caption }: MapPageProps): React.ReactElement {
         }}
       >
         <div>
-          <div className="smallcaps" style={{ fontSize: 10, color: "var(--ink-faded)" }}>itinerary · plate vii</div>
+          <div className="smallcaps" style={{ fontSize: 10, color: "var(--ink-faded)" }}>{texts?.eyebrow || "itinerary · plate vii"}</div>
           <h3 className="f-display" style={{ fontSize: 30, fontStyle: "italic", margin: "4px 0 0", color: "var(--ink)" }}>
-            {caption || "The Route"}
+            {caption || texts?.caption || "The Route"}
           </h3>
         </div>
         <Compass size={56} style={{ opacity: 0.85 }} />
@@ -78,26 +79,17 @@ export default function MapPage({ caption }: MapPageProps): React.ReactElement {
         }}
       >
         <div style={{ flex: "0 0 180px" }}>
-          <div className="smallcaps" style={{ fontSize: 10, color: "var(--terracotta-deep)", marginBottom: 6 }}>route</div>
+          <div className="smallcaps" style={{ fontSize: 10, color: "var(--terracotta-deep)", marginBottom: 6 }}>{texts?.routeHeader || "route"}</div>
           <div className="f-serif" style={{ fontSize: 13, lineHeight: 1.6, color: "var(--ink-soft)" }}>
-            <div>
-              ① Napoli &nbsp; <span style={{ opacity: 0.6 }}>3 days</span>
-            </div>
-            <div>
-              ② Roma &nbsp; <span style={{ opacity: 0.6 }}>5 days</span>
-            </div>
-            <div>
-              ③ Firenze &nbsp; <span style={{ opacity: 0.6 }}>4 days</span>
-            </div>
-            <div>
-              ④ Venezia &nbsp; <span style={{ opacity: 0.6 }}>3 days</span>
-            </div>
+            <div>{texts?.stop1 || "① Napoli   3 days"}</div>
+            <div>{texts?.stop2 || "② Roma   5 days"}</div>
+            <div>{texts?.stop3 || "③ Firenze   4 days"}</div>
+            <div>{texts?.stop4 || "④ Venezia   3 days"}</div>
           </div>
         </div>
         <div style={{ flex: 1, fontStyle: "italic" }}>
           <p className="f-script" style={{ fontSize: 18, lineHeight: 1.3, color: "var(--ink-soft)", margin: 0 }}>
-            850 km of slow trains, three stolen siestas, & one entirely unintentional stop in a town with no name on any
-            map.
+            {texts?.routeNote || "850 km of slow trains, three stolen siestas, & one entirely unintentional stop in a town with no name on any map."}
           </p>
         </div>
       </div>
@@ -107,11 +99,11 @@ export default function MapPage({ caption }: MapPageProps): React.ReactElement {
       </div>
 
       <div style={{ position: "absolute", top: 80, right: 50 }}>
-        <PassportStamp city="MAPPA" date="VII·74" color="teal" rotate={-6} />
+        <PassportStamp city={texts?.stampCity || "MAPPA"} date={texts?.stampDate || "VII·74"} color="teal" rotate={-6} />
       </div>
 
       <div className="page-num" style={{ left: "50%", transform: "translateX(-50%)" }}>
-        — 22 —
+        {texts?.pageNumber || "-- 22 --"}
       </div>
     </PageBg>
   );

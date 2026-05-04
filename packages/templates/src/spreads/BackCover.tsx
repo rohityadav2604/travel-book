@@ -4,9 +4,10 @@ import { Flourish, Stamp, PassportStamp, Botanical, FernSprig } from "@memoryboo
 
 export type BackCoverProps = {
   brand: string | undefined;
+  texts?: Record<string, string> | undefined;
 };
 
-export default function BackCover({ brand }: BackCoverProps): React.ReactElement {
+export default function BackCover({ brand, texts }: BackCoverProps): React.ReactElement {
   return (
     <PageBg>
       <div
@@ -23,23 +24,24 @@ export default function BackCover({ brand }: BackCoverProps): React.ReactElement
         <div style={{ transform: "rotate(-6deg)" }}>
           <Stamp country="MUNDO" value="∞" color="olive" />
         </div>
-        <PassportStamp city="THE END" date="MCMLXXIV" color="terra" rotate={6} />
+        <PassportStamp city={texts?.passportCity || "THE END"} date={texts?.passportDate || "MCMLXXIV"} color="terra" rotate={6} />
       </div>
 
       {/* address-block style memory */}
       <div style={{ position: "absolute", top: 120, left: 60, width: 280 }}>
         <div className="f-mono" style={{ fontSize: 10, color: "var(--ink-faded)", letterSpacing: "0.2em", marginBottom: 10 }}>
-          — RETURN TO —
+          {texts?.returnLabel || "-- RETURN TO --"}
         </div>
         <div className="f-script" style={{ fontSize: 24, color: "var(--ink)", marginBottom: 4 }}>
-          the one who wandered
+          {texts?.returnName || "the one who wandered"}
         </div>
         <div className="f-script" style={{ fontSize: 18, color: "var(--ink-soft)", lineHeight: 1.4 }}>
-          c/o the kitchen table
-          <br />
-          a small flat by the river
-          <br />
-          somewhere quiet, again
+          {(texts?.returnAddress || "c/o the kitchen table\na small flat by the river\nsomewhere quiet, again").split("\n").map((line) => (
+            <React.Fragment key={line}>
+              {line}
+              <br />
+            </React.Fragment>
+          ))}
         </div>
       </div>
 
@@ -57,11 +59,12 @@ export default function BackCover({ brand }: BackCoverProps): React.ReactElement
             textWrap: "balance",
           }}
         >
-          And so we came home,
-          <br />
-          full of weather & cheese
-          <br />
-          & impossible light.
+          {(texts?.sentiment || "And so we came home,\nfull of weather & cheese\n& impossible light.").split("\n").map((line) => (
+            <React.Fragment key={line}>
+              {line}
+              <br />
+            </React.Fragment>
+          ))}
         </p>
         <Flourish width={180} color="#8b3a1e" style={{ display: "block", margin: "28px auto 0" }} />
       </div>
@@ -69,7 +72,7 @@ export default function BackCover({ brand }: BackCoverProps): React.ReactElement
       {/* colophon */}
       <div style={{ position: "absolute", bottom: 110, left: 60, right: 60, textAlign: "center" }}>
         <div className="smallcaps" style={{ fontSize: 10, color: "var(--ink-faded)", letterSpacing: "0.4em" }}>
-          colophon
+          {texts?.colophonLabel || "colophon"}
         </div>
         <p
           className="f-serif"
@@ -83,8 +86,7 @@ export default function BackCover({ brand }: BackCoverProps): React.ReactElement
             margin: "8px auto 0",
           }}
         >
-          Bound & printed in a small shop near the harbor. Set in Cormorant & Caveat. Two hundred copies — this is
-          no. 047.
+          {texts?.colophon || "Bound & printed in a small shop near the harbor. Set in Cormorant & Caveat. Two hundred copies -- this is no. 047."}
         </p>
       </div>
 
@@ -119,7 +121,7 @@ export default function BackCover({ brand }: BackCoverProps): React.ReactElement
           color: "var(--ink-faded)",
         }}
       >
-        {brand || "Wanderbound"} · ~ FIN ~
+        {brand || texts?.brand || "Wanderbound"} · ~ FIN ~
       </div>
     </PageBg>
   );

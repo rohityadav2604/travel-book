@@ -5,9 +5,10 @@ import { Flourish, PassportStamp, Botanical } from "@memorybook/design/component
 export type GoldenHourProps = {
   leftPhotoUrl: string | undefined;
   rightPhotos: { url: string | undefined; caption?: string }[];
+  texts?: Record<string, string> | undefined;
 };
 
-export default function GoldenHour({ leftPhotoUrl, rightPhotos }: GoldenHourProps): React.ReactElement {
+export default function GoldenHour({ leftPhotoUrl, rightPhotos, texts }: GoldenHourProps): React.ReactElement {
   return (
     <PageBg>
       {/* Left page — full bleed warm landscape */}
@@ -48,9 +49,9 @@ export default function GoldenHour({ leftPhotoUrl, rightPhotos }: GoldenHourProp
           gap: 12,
         }}
       >
-        <div className="smallcaps" style={{ fontSize: 10, color: "var(--ink-faded)", marginBottom: 4 }}>golden hour · plate vi</div>
+        <div className="smallcaps" style={{ fontSize: 10, color: "var(--ink-faded)", marginBottom: 4 }}>{texts?.eyebrow || "golden hour · plate vi"}</div>
         <h3 className="f-display" style={{ fontSize: 26, fontStyle: "italic", margin: 0, color: "var(--ink)" }}>
-          Evening Light
+          {texts?.title || "Evening Light"}
         </h3>
         <Flourish width={180} color="#8b3a1e" />
 
@@ -77,7 +78,7 @@ export default function GoldenHour({ leftPhotoUrl, rightPhotos }: GoldenHourProp
 
         <div style={{ marginTop: "auto" }}>
           <p className="f-serif" style={{ fontStyle: "italic", fontSize: 13, lineHeight: 1.5, color: "var(--ink-soft)" }}>
-            The light here arrives slowly and leaves all at once — by six the walls turn the color of saffron, and by seven they are violet.
+            {texts?.footerNote || "The light here arrives slowly and leaves all at once -- by six the walls turn the color of saffron, and by seven they are violet."}
           </p>
         </div>
       </div>
@@ -87,11 +88,11 @@ export default function GoldenHour({ leftPhotoUrl, rightPhotos }: GoldenHourProp
       </div>
 
       <div style={{ position: "absolute", top: 80, right: 20 }}>
-        <PassportStamp city="GOLDEN" date="19·VIII·74" color="terra" rotate={12} />
+        <PassportStamp city={texts?.stampCity || "GOLDEN"} date={texts?.stampDate || "19·VIII·74"} color="terra" rotate={12} />
       </div>
 
       <div className="page-num" style={{ left: "50%", transform: "translateX(-50%)" }}>
-        — 22 —
+        {texts?.pageNumber || "-- 22 --"}
       </div>
     </PageBg>
   );
