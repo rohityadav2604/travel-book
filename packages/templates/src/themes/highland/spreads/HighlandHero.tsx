@@ -3,15 +3,16 @@ import { HPageBg, HPhoto } from "../components/PageShell";
 
 export type HighlandHeroProps = {
   photoUrl: string | undefined;
+  photoSlotId?: string;
   caption?: string | undefined;
   subtitle?: string | undefined;
   texts?: Record<string, string> | undefined;
 };
 
-export default function HighlandHero({ photoUrl, caption, subtitle, texts }: HighlandHeroProps): React.ReactElement {
+export default function HighlandHero({ photoUrl, photoSlotId, caption, subtitle, texts }: HighlandHeroProps): React.ReactElement {
   return (
     <HPageBg>
-      <HPhoto src={photoUrl} style={{ position: "absolute", inset: 0 }} />
+      <HPhoto src={photoUrl} slotId={photoSlotId} style={{ position: "absolute", inset: 0 }} />
       <div
         style={{
           position: "absolute",

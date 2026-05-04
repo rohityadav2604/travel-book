@@ -92,7 +92,7 @@ async function processRenderJob(
     const placements = book.placementJson as Array<{
       spreadId: string;
       templateName: string;
-      assignments: Array<{ slotId: string; photoId: string }>;
+      assignments: Array<{ slotId: string; photoId: string; adjustments?: { offsetX: number; offsetY: number; zoom: number; rotation: number } }>;
       texts?: Record<string, string>;
     }>;
 
@@ -105,6 +105,7 @@ async function processRenderJob(
     for (const placement of placements) {
       const slots: Record<string, string | undefined> = {};
       const captions: Record<string, string> = {};
+      const adjustments: Record<string, { offsetX: number; offsetY: number; zoom: number; rotation: number }> = {};
       for (const a of placement.assignments) {
         const photo = photoMap.get(a.photoId);
         // Use original storageKey for print quality; fallback to thumbnailKey
@@ -117,6 +118,9 @@ async function processRenderJob(
         }
         if (photo?.caption) {
           captions[a.slotId] = photo.caption;
+        }
+        if (a.adjustments) {
+          adjustments[a.slotId] = a.adjustments;
         }
       }
       for (const [key, value] of Object.entries(placement.texts ?? {})) {
@@ -131,6 +135,7 @@ async function processRenderJob(
         templateName,
         slots,
         captions: Object.keys(captions).length > 0 ? captions : undefined,
+        adjustments: Object.keys(adjustments).length > 0 ? adjustments : undefined,
         width,
         height,
         quality: payload.quality,

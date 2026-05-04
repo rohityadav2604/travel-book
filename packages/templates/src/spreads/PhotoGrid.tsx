@@ -4,8 +4,9 @@ import { Flourish, Botanical } from "@memorybook/design/components/decorations";
 
 export type PhotoGridProps = {
   heroUrl: string | undefined;
+  heroSlotId?: string;
   heroCaption?: string;
-  smallPhotos: Array<{ url: string | undefined; caption?: string }>;
+  smallPhotos: Array<{ url: string | undefined; caption?: string; slotId: string }>;
   title?: string;
   date?: string;
   footerNote?: string;
@@ -14,6 +15,7 @@ export type PhotoGridProps = {
 
 export default function PhotoGrid({
   heroUrl,
+  heroSlotId,
   heroCaption,
   smallPhotos,
   title,
@@ -42,7 +44,7 @@ export default function PhotoGrid({
 
       {/* hero on left */}
       <div style={{ position: "absolute", top: 120, left: 60, width: 260, height: 240 }}>
-        <Photo src={heroUrl} style={{ width: "100%", height: "100%" }} />
+        <Photo src={heroUrl} slotId={heroSlotId} style={{ width: "100%", height: "100%" }} />
         <div className="f-script" style={{ fontSize: 16, color: "var(--ink-soft)", marginTop: 4, textAlign: "center" }}>
           {renderedHeroCaption}
         </div>
@@ -52,7 +54,7 @@ export default function PhotoGrid({
       <div style={{ position: "absolute", top: 120, right: 60, width: 170, display: "flex", flexDirection: "column", gap: 4 }}>
         {photos.map((p, i) => (
           <div key={i}>
-            <Photo src={p.url} style={{ width: "100%", height: 78 }} />
+            <Photo src={p.url} slotId={p.slotId} style={{ width: "100%", height: 78 }} />
             <div className="f-script" style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: -1, textAlign: "center" }}>
               {p.caption || ""}
             </div>

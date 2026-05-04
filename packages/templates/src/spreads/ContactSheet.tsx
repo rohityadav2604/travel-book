@@ -1,6 +1,8 @@
 import React from "react";
+import { Photo } from "../components/PageShell";
+
 export type ContactSheetProps = {
-  photos: Array<{ url: string | undefined; caption?: string }>;
+  photos: Array<{ url: string | undefined; caption?: string; slotId: string }>;
   texts?: Record<string, string> | undefined;
 };
 
@@ -65,15 +67,11 @@ export default function ContactSheet({ photos, texts }: ContactSheetProps): Reac
         {gridPhotos.map((p, i) => (
           <div key={i} style={{ position: "relative", overflow: "hidden", background: "#1a120c" }}>
             {p.url && (
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  backgroundImage: `url(${p.url})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  filter: "saturate(.7) contrast(1.1) sepia(.25) brightness(.95)",
-                }}
+              <Photo
+                src={p.url}
+                slotId={p.slotId}
+                vintage={false}
+                style={{ position: "absolute", inset: 0, filter: "saturate(.7) contrast(1.1) sepia(.25) brightness(.95)" }}
               />
             )}
             {/* Frame number */}

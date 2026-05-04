@@ -4,16 +4,17 @@ import { Flourish, PassportStamp, Botanical } from "@memorybook/design/component
 
 export type GoldenHourProps = {
   leftPhotoUrl: string | undefined;
-  rightPhotos: { url: string | undefined; caption?: string }[];
+  leftSlotId?: string;
+  rightPhotos: { url: string | undefined; caption?: string; slotId: string }[];
   texts?: Record<string, string> | undefined;
 };
 
-export default function GoldenHour({ leftPhotoUrl, rightPhotos, texts }: GoldenHourProps): React.ReactElement {
+export default function GoldenHour({ leftPhotoUrl, leftSlotId, rightPhotos, texts }: GoldenHourProps): React.ReactElement {
   return (
     <PageBg>
       {/* Left page — full bleed warm landscape */}
       <div style={{ position: "absolute", top: 0, left: 0, width: 340, height: 600, overflow: "hidden" }}>
-        {leftPhotoUrl && <Photo src={leftPhotoUrl} style={{ position: "absolute", inset: 0 }} />}
+        {leftPhotoUrl && <Photo src={leftPhotoUrl} slotId={leftSlotId} style={{ position: "absolute", inset: 0 }} />}
         <div
           style={{
             position: "absolute",
@@ -57,7 +58,7 @@ export default function GoldenHour({ leftPhotoUrl, rightPhotos, texts }: GoldenH
 
         {rightPhotos.slice(0, 3).map((photo, i) => (
           <div key={i} style={{ position: "relative", width: "100%", height: 140, overflow: "hidden", borderRadius: 2, border: "1px solid rgba(44,31,21,.1)" }}>
-            {photo.url && <Photo src={photo.url} style={{ position: "absolute", inset: 0 }} />}
+            {photo.url && <Photo src={photo.url} slotId={photo.slotId} style={{ position: "absolute", inset: 0 }} />}
             {photo.caption && (
               <p
                 className="f-script"

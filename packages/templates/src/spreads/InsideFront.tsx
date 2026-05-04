@@ -5,10 +5,11 @@ import { Flourish, PassportStamp, Botanical } from "@memorybook/design/component
 export type InsideFrontProps = {
   quote: string | undefined;
   photoUrl: string | undefined;
+  photoSlotId?: string;
   texts?: Record<string, string> | undefined;
 };
 
-export default function InsideFront({ quote, photoUrl, texts }: InsideFrontProps): React.ReactElement {
+export default function InsideFront({ quote, photoUrl, photoSlotId, texts }: InsideFrontProps): React.ReactElement {
   const renderedQuote = quote || texts?.quote || "The world is a book, and those who do not travel read only one page.";
   const attribution = texts?.attribution || "-- st. augustine";
 
@@ -55,7 +56,7 @@ export default function InsideFront({ quote, photoUrl, texts }: InsideFrontProps
               transform: "rotate(-3deg)",
             }}
           >
-            <Photo src={photoUrl} style={{ position: "relative", width: 160, height: 160 }} />
+            <Photo src={photoUrl} slotId={photoSlotId} style={{ position: "relative", width: 160, height: 160 }} />
           </div>
         )}
       </div>

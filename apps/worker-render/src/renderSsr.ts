@@ -1,11 +1,13 @@
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 import SpreadComposer from "@memorybook/templates/SpreadComposer";
+import type { PhotoAdjustment } from "@memorybook/templates";
 
 export type SsrRenderInput = {
   templateName: string;
   slots: Record<string, string | undefined>;
   captions: Record<string, string> | undefined;
+  adjustments?: Record<string, PhotoAdjustment> | undefined;
   width: number;
   height: number;
   quality: "print" | "screen";
@@ -17,6 +19,7 @@ export function renderSpreadToHtml(input: SsrRenderInput): string {
     templateName: input.templateName,
     slots: input.slots,
     captions: input.captions,
+    adjustments: input.adjustments,
     theme: input.theme,
   });
 

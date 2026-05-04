@@ -1,12 +1,15 @@
 import React from "react";
+import { AdjustableImg } from "../../../components/PageShell";
 
 export default function CityCover({
   heroUrl,
+  heroSlotId,
   title,
   date,
   texts,
 }: {
   heroUrl?: string | undefined;
+  heroSlotId?: string;
   title?: string | undefined;
   date?: string | undefined;
   texts?: Record<string, string> | undefined;
@@ -15,7 +18,7 @@ export default function CityCover({
     <div className="relative h-full w-full overflow-hidden" style={{ background: "#1c2025" }}>
       {heroUrl ? (
         <>
-          <img src={heroUrl} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ filter: "saturate(.7) contrast(1.05) brightness(.6)" }} />
+          <AdjustableImg src={heroUrl} slotId={heroSlotId} className="absolute inset-0 h-full w-full" imgStyle={{ filter: "saturate(.7) contrast(1.05) brightness(.6)" }} />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(15,19,24,0.2), rgba(15,19,24,0.85))" }} />
         </>
       ) : (

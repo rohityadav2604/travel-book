@@ -30,14 +30,17 @@ function opt<T>(value: T | undefined): T | undefined {
 export default function WanderboundComposer({ templateName, slots, captions = undefined }: SpreadComposerProps): React.ReactElement {
   switch (templateName) {
     case "GrandVista":
-      return <GrandVista photoUrl={slots.hero} caption={opt(captions?.hero)} subtitle={opt(captions?.subtitle)} texts={captions} />;
+      return <GrandVista photoUrl={slots.hero} photoSlotId="hero" caption={opt(captions?.hero)} subtitle={opt(captions?.subtitle)} texts={captions} />;
 
     case "JournalPage":
       return (
         <JournalPage
           leftPhotoUrl={slots.left}
+          leftSlotId="left"
           topRightPhotoUrl={slots.topRight}
+          topRightSlotId="topRight"
           bottomRightPhotoUrl={slots.bottomRight}
+          bottomRightSlotId="bottomRight"
           date={opt(captions?.date)}
           weather={opt(captions?.weather)}
           location={opt(captions?.location)}
@@ -50,9 +53,9 @@ export default function WanderboundComposer({ templateName, slots, captions = un
       );
 
     case "PolaroidWall": {
-      const polaroidPhotos = Object.values(slots).map((url, i) => {
+      const polaroidPhotos = Object.entries(slots).map(([k, url], i) => {
         const cap = captions?.[`photo-${i}`];
-        return cap ? { url, caption: cap } : { url };
+        return cap ? { url, caption: cap, slotId: k } : { url, slotId: k };
       });
       return <PolaroidWall photos={polaroidPhotos} texts={captions} />;
     }
@@ -61,12 +64,13 @@ export default function WanderboundComposer({ templateName, slots, captions = un
       return (
         <GoldenHour
           leftPhotoUrl={slots.left}
+          leftSlotId="left"
           texts={captions}
           rightPhotos={Object.entries(slots)
             .filter(([k]) => k.startsWith("right"))
             .map(([k, url]) => {
               const cap = captions?.[k];
-              return cap ? { url, caption: cap } : { url };
+              return cap ? { url, caption: cap, slotId: k } : { url, slotId: k };
             })}
         />
       );
@@ -77,16 +81,16 @@ export default function WanderboundComposer({ templateName, slots, captions = un
           texts={captions}
           photos={Object.entries(slots).map(([k, url]) => {
             const cap = captions?.[k];
-            return cap ? { url, caption: cap } : { url };
+            return cap ? { url, caption: cap, slotId: k } : { url, slotId: k };
           })}
         />
       );
 
     case "Cover":
-      return <Cover heroUrl={slots.hero} title={opt(captions?.title)} date={opt(captions?.date)} texts={captions} />;
+      return <Cover heroUrl={slots.hero} heroSlotId="hero" title={opt(captions?.title)} date={opt(captions?.date)} texts={captions} />;
 
     case "InsideFront":
-      return <InsideFront quote={opt(captions?.quote)} photoUrl={slots.accent} texts={captions} />;
+      return <InsideFront quote={opt(captions?.quote)} photoUrl={slots.accent} photoSlotId="accent" texts={captions} />;
 
     case "InsideBack":
       return <InsideBack tripStats={captions?.stats ? JSON.parse(captions.stats) : undefined} texts={captions} />;
@@ -95,23 +99,25 @@ export default function WanderboundComposer({ templateName, slots, captions = un
       return <BackCover brand={opt(captions?.brand)} texts={captions} />;
 
     case "ChapterDivider":
-      return <ChapterDivider photoUrl={slots.hero} label={captions?.label || "Chapter"} texts={captions} />;
+      return <ChapterDivider photoUrl={slots.hero} photoSlotId="hero" label={captions?.label || "Chapter"} texts={captions} />;
 
     case "MapPage":
-      return <MapPage photoUrl={slots.hero} caption={opt(captions?.caption)} texts={captions} />;
+      return <MapPage photoUrl={slots.hero} photoSlotId="hero" caption={opt(captions?.caption)} texts={captions} />;
 
     case "QuotePage":
       return <QuotePage quote={opt(captions?.quote)} caption={opt(captions?.caption)} texts={captions} />;
 
     case "Ephemera":
-      return <Ephemera photos={Object.values(slots)} texts={captions} />;
+      return <Ephemera photos={Object.entries(slots).map(([k, url]) => ({ url, slotId: k }))} texts={captions} />;
 
     case "IndexPage":
       return <IndexPage texts={captions} />;
 
     case "SinglePhotoPage": {
-      const spProps: { photoUrl: string | undefined; caption?: string; title?: string; date?: string; texts?: Record<string, string> | undefined } = {
+      const slotId = slots.hero ? "hero" : slots.left ? "left" : "photo";
+      const spProps: { photoUrl: string | undefined; photoSlotId: string; caption?: string; title?: string; date?: string; texts?: Record<string, string> | undefined } = {
         photoUrl: slots.hero || slots.left,
+        photoSlotId: slotId,
       };
       const cap = captions?.caption || captions?.hero;
       if (cap) spProps.caption = cap;
@@ -124,17 +130,19 @@ export default function WanderboundComposer({ templateName, slots, captions = un
     case "PhotoGrid": {
       const pgProps: {
         heroUrl: string | undefined;
+        heroSlotId: string;
         heroCaption?: string;
-        smallPhotos: Array<{ url: string | undefined; caption?: string }>;
+        smallPhotos: Array<{ url: string | undefined; caption?: string; slotId: string }>;
         texts?: Record<string, string> | undefined;
       } = {
         heroUrl: slots.hero || slots.left,
+        heroSlotId: slots.hero ? "hero" : "left",
         texts: captions,
         smallPhotos: [
-          { url: slots.topRight, ...(captions?.topRight ? { caption: captions.topRight } : {}) },
-          { url: slots.bottomRight, ...(captions?.bottomRight ? { caption: captions.bottomRight } : {}) },
-          { url: slots[`photo-0`], ...(captions?.[`photo-0`] ? { caption: captions[`photo-0`] } : {}) },
-        ].filter((p) => p.url) as Array<{ url: string | undefined; caption?: string }>,
+          { url: slots.topRight, slotId: "topRight", ...(captions?.topRight ? { caption: captions.topRight } : {}) },
+          { url: slots.bottomRight, slotId: "bottomRight", ...(captions?.bottomRight ? { caption: captions.bottomRight } : {}) },
+          { url: slots[`photo-0`], slotId: "photo-0", ...(captions?.[`photo-0`] ? { caption: captions[`photo-0`] } : {}) },
+        ].filter((p) => p.url) as Array<{ url: string | undefined; caption?: string; slotId: string }>,
       };
       const hc = captions?.hero || captions?.left;
       if (hc) pgProps.heroCaption = hc;
@@ -143,14 +151,14 @@ export default function WanderboundComposer({ templateName, slots, captions = un
 
     case "PhotoJournal": {
       const pjProps: {
-        photos: Array<{ url: string | undefined; caption?: string }>;
+        photos: Array<{ url: string | undefined; caption?: string; slotId: string }>;
         title?: string;
         texts?: Record<string, string> | undefined;
       } = {
         texts: captions,
-        photos: Object.entries(slots).map(([, url], i) => {
+        photos: Object.entries(slots).map(([k, url], i) => {
           const cap = captions?.[`photo-${i}`] || captions?.[`right-${i}`];
-          return cap ? { url, caption: cap } : { url };
+          return cap ? { url, caption: cap, slotId: k } : { url, slotId: k };
         }),
       };
       if (captions?.title) pjProps.title = captions.title;
@@ -161,6 +169,7 @@ export default function WanderboundComposer({ templateName, slots, captions = un
       return (
         <HeroFocus
           photoUrl={slots.hero || slots.left || slots.photo}
+          photoSlotId={slots.hero ? "hero" : slots.left ? "left" : "photo"}
           caption={opt(captions?.caption || captions?.hero)}
           subtitle={opt(captions?.subtitle)}
           texts={captions}
@@ -171,7 +180,9 @@ export default function WanderboundComposer({ templateName, slots, captions = un
       return (
         <GalleryDuo
           leftUrl={slots.left || slots[`photo-0`]}
+          leftSlotId={slots.left ? "left" : "photo-0"}
           rightUrl={slots.right || slots[`photo-1`]}
+          rightSlotId={slots.right ? "right" : "photo-1"}
           leftCaption={opt(captions?.left || captions?.[`photo-0`])}
           rightCaption={opt(captions?.right || captions?.[`photo-1`])}
           title={opt(captions?.title)}
@@ -182,7 +193,7 @@ export default function WanderboundComposer({ templateName, slots, captions = un
     case "MosaicGrid": {
       const mosaicPhotos = Object.entries(slots).map(([k, url]) => {
         const cap = captions?.[k];
-        return cap ? { url, caption: cap } : { url };
+        return cap ? { url, caption: cap, slotId: k } : { url, slotId: k };
       });
       return <MosaicGrid photos={mosaicPhotos} />;
     }
@@ -191,6 +202,7 @@ export default function WanderboundComposer({ templateName, slots, captions = un
       return (
         <StorySpread
           accentUrl={slots.accent}
+          accentSlotId="accent"
           title={opt(captions?.title)}
           body={opt(captions?.body || captions?.caption)}
           author={opt(captions?.author)}
@@ -202,6 +214,7 @@ export default function WanderboundComposer({ templateName, slots, captions = un
       return (
         <GroupPhotoSpread
           photoUrl={slots.hero}
+          photoSlotId="hero"
           caption={opt(captions?.caption || captions?.hero)}
           subtitle={opt(captions?.subtitle)}
         />

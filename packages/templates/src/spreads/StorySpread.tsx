@@ -1,4 +1,5 @@
 import React from "react";
+import { AdjustableImg } from "../components/PageShell";
 
 const defaultTitle = "The Road Behind & Ahead";
 
@@ -9,12 +10,14 @@ const defaultBody =
 
 export default function StorySpread({
   accentUrl,
+  accentSlotId,
   title,
   body,
   author,
   date,
 }: {
   accentUrl?: string | undefined;
+  accentSlotId?: string;
   title?: string | undefined;
   body?: string | undefined;
   author?: string | undefined;
@@ -110,11 +113,11 @@ export default function StorySpread({
                 boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
               }}
             >
-              <img
+              <AdjustableImg
                 src={accentUrl}
-                alt=""
-                className="h-full w-full object-cover"
-                style={{ filter: "saturate(.85) contrast(.95) sepia(.12) brightness(.98)" }}
+                slotId={accentSlotId}
+                className="h-full w-full"
+                imgStyle={{ filter: "saturate(.85) contrast(.95) sepia(.12) brightness(.98)" }}
               />
             </div>
           )}

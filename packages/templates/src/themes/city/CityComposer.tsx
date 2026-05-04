@@ -14,18 +14,18 @@ function opt<T>(value: T | undefined): T | undefined {
 export default function CityComposer({ templateName, slots, captions = undefined }: SpreadComposerProps): React.ReactElement {
   switch (templateName) {
     case "CityCover":
-      return <CityCover heroUrl={slots.hero} title={opt(captions?.title)} date={opt(captions?.date)} texts={captions} />;
+      return <CityCover heroUrl={slots.hero} heroSlotId="hero" title={opt(captions?.title)} date={opt(captions?.date)} texts={captions} />;
 
     case "CityHero":
-      return <CityHero photoUrl={slots.hero} caption={opt(captions?.caption || captions?.hero)} subtitle={opt(captions?.subtitle)} texts={captions} />;
+      return <CityHero photoUrl={slots.hero} photoSlotId="hero" caption={opt(captions?.caption || captions?.hero)} subtitle={opt(captions?.subtitle)} texts={captions} />;
 
     case "CityMap":
-      return <CityMap photoUrl={slots.hero} caption={opt(captions?.caption)} texts={captions} />;
+      return <CityMap photoUrl={slots.hero} photoSlotId="hero" caption={opt(captions?.caption)} texts={captions} />;
 
     case "MosaicGrid": {
       const mosaicPhotos = Object.entries(slots).map(([k, url]) => {
         const cap = captions?.[k];
-        return cap ? { url, caption: cap } : { url };
+        return cap ? { url, caption: cap, slotId: k } : { url, slotId: k };
       });
       return <MosaicGrid photos={mosaicPhotos} />;
     }

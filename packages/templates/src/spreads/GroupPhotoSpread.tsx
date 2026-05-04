@@ -1,11 +1,14 @@
 import React from "react";
+import { AdjustableImg } from "../components/PageShell";
 
 export default function GroupPhotoSpread({
   photoUrl,
+  photoSlotId,
   caption,
   subtitle,
 }: {
   photoUrl?: string | undefined;
+  photoSlotId?: string;
   caption?: string | undefined;
   subtitle?: string | undefined;
 }): React.ReactElement {
@@ -13,11 +16,11 @@ export default function GroupPhotoSpread({
     <div className="relative h-full w-full overflow-hidden" style={{ background: "inherit" }}>
       {photoUrl ? (
         <>
-          <img
+          <AdjustableImg
             src={photoUrl}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ filter: "saturate(.85) contrast(.95) sepia(.08) brightness(.96)" }}
+            slotId={photoSlotId}
+            className="absolute inset-0 h-full w-full"
+            imgStyle={{ filter: "saturate(.85) contrast(.95) sepia(.08) brightness(.96)" }}
           />
           {/* Bottom gradient for text legibility */}
           <div className="absolute inset-0" style={{

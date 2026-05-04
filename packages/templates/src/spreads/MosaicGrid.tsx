@@ -1,8 +1,10 @@
 import React from "react";
+import { AdjustableImg } from "../components/PageShell";
 
 export type MosaicPhoto = {
   url?: string | undefined;
   caption?: string | undefined;
+  slotId: string;
 };
 
 export default function MosaicGrid({ photos }: { photos: MosaicPhoto[] }): React.ReactElement {
@@ -36,14 +38,11 @@ export default function MosaicGrid({ photos }: { photos: MosaicPhoto[] }): React
           >
             {p.url ? (
               <>
-                <img
+                <AdjustableImg
                   src={p.url}
-                  alt=""
+                  slotId={p.slotId}
                   className="h-full w-full"
-                  style={{
-                    objectFit: "cover",
-                    filter: "saturate(.85) contrast(.95) sepia(.12) brightness(.98)",
-                  }}
+                  imgStyle={{ filter: "saturate(.85) contrast(.95) sepia(.12) brightness(.98)" }}
                 />
                 {p.caption && (
                   <div

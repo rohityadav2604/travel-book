@@ -3,13 +3,14 @@ import { HPageBg, HPhoto } from "../components/PageShell";
 
 export type HighlandGridProps = {
   heroUrl: string | undefined;
+  heroSlotId?: string;
   heroCaption?: string | undefined;
-  smallPhotos: Array<{ url: string | undefined; caption?: string }>;
+  smallPhotos: Array<{ url: string | undefined; caption?: string; slotId: string }>;
   title?: string | undefined;
   texts?: Record<string, string> | undefined;
 };
 
-export default function HighlandGrid({ heroUrl, heroCaption, smallPhotos, title, texts }: HighlandGridProps): React.ReactElement {
+export default function HighlandGrid({ heroUrl, heroSlotId, heroCaption, smallPhotos, title, texts }: HighlandGridProps): React.ReactElement {
   return (
     <HPageBg>
       <div style={{ position: "absolute", top: 30, left: 56, right: 56, display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 16 }}>
@@ -23,7 +24,7 @@ export default function HighlandGrid({ heroUrl, heroCaption, smallPhotos, title,
 
       <div style={{ position: "absolute", top: 70, left: 56, right: 56, bottom: 110, display: "grid", gridTemplateColumns: "1.4fr 1fr", gridTemplateRows: "1.3fr 1fr", gap: 8 }}>
         <div style={{ gridRow: "1 / span 2", position: "relative" }}>
-          <HPhoto src={heroUrl} style={{ width: "100%", height: "100%" }} />
+          <HPhoto src={heroUrl} slotId={heroSlotId} style={{ width: "100%", height: "100%" }} />
           {(heroCaption || texts?.hero) && (
             <div className="m-caps" style={{ position: "absolute", bottom: 10, left: 12, fontSize: 8, color: "#ecebe2", letterSpacing: ".3em", textShadow: "0 1px 3px rgba(0,0,0,.6)" }}>
               {heroCaption || texts?.hero}
@@ -32,7 +33,7 @@ export default function HighlandGrid({ heroUrl, heroCaption, smallPhotos, title,
         </div>
         {smallPhotos.slice(0, 2).map((p, i) => (
           <div key={i} style={{ position: "relative" }}>
-            <HPhoto src={p.url} style={{ width: "100%", height: "100%" }} />
+            <HPhoto src={p.url} slotId={p.slotId} style={{ width: "100%", height: "100%" }} />
             {(p.caption || texts?.[i === 0 ? "topRight" : "bottomRight"]) && (
               <div className="m-caps" style={{ position: "absolute", bottom: 8, left: 10, fontSize: 8, color: "#ecebe2", letterSpacing: ".3em", textShadow: "0 1px 3px rgba(0,0,0,.6)" }}>
                 {p.caption || texts?.[i === 0 ? "topRight" : "bottomRight"]}

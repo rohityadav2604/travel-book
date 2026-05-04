@@ -4,6 +4,7 @@ import { Flourish, PassportStamp, Botanical, FernSprig } from "@memorybook/desig
 
 export type ChapterDividerProps = {
   photoUrl: string | undefined;
+  photoSlotId?: string;
   label: string | undefined;
   texts?: Record<string, string> | undefined;
 };

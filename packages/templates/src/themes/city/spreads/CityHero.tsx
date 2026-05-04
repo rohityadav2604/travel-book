@@ -1,12 +1,16 @@
 import React from "react";
 
+import { AdjustableImg } from "../../../components/PageShell";
+
 export default function CityHero({
   photoUrl,
+  photoSlotId,
   caption,
   subtitle,
   texts,
 }: {
   photoUrl?: string | undefined;
+  photoSlotId?: string;
   caption?: string | undefined;
   subtitle?: string | undefined;
   texts?: Record<string, string> | undefined;
@@ -14,7 +18,7 @@ export default function CityHero({
   return (
     <div className="relative h-full w-full overflow-hidden" style={{ background: "#1c2025" }}>
       {photoUrl ? (
-        <img src={photoUrl} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ filter: "saturate(.75) contrast(1.02) brightness(.7)" }} />
+        <AdjustableImg src={photoUrl} slotId={photoSlotId} className="absolute inset-0 h-full w-full" imgStyle={{ filter: "saturate(.75) contrast(1.02) brightness(.7)" }} />
       ) : (
         <div className="absolute inset-0" style={{ background: "#252b32" }} />
       )}

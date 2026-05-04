@@ -3,6 +3,7 @@ import { PageBg, Photo } from "../components/PageShell";
 
 export type HeroFocusProps = {
   photoUrl: string | undefined;
+  photoSlotId?: string;
   caption?: string | undefined;
   subtitle?: string | undefined;
   texts?: Record<string, string> | undefined;
@@ -10,6 +11,7 @@ export type HeroFocusProps = {
 
 export default function HeroFocus({
   photoUrl,
+  photoSlotId,
   caption,
   subtitle,
   texts,
@@ -48,6 +50,7 @@ export default function HeroFocus({
       >
         <Photo
           src={photoUrl}
+          slotId={photoSlotId}
           fit="contain"
           vintage={false}
           style={{

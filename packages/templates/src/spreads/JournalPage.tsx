@@ -4,8 +4,11 @@ import { PassportStamp } from "@memorybook/design/components/decorations";
 
 export type JournalPageProps = {
   leftPhotoUrl: string | undefined;
+  leftSlotId?: string;
   topRightPhotoUrl: string | undefined;
+  topRightSlotId?: string;
   bottomRightPhotoUrl: string | undefined;
+  bottomRightSlotId?: string;
   date: string | undefined;
   weather?: string | undefined;
   location?: string | undefined;
@@ -18,8 +21,11 @@ export type JournalPageProps = {
 
 export default function JournalPage({
   leftPhotoUrl,
+  leftSlotId,
   topRightPhotoUrl,
+  topRightSlotId,
   bottomRightPhotoUrl,
+  bottomRightSlotId,
   date,
   weather,
   location,
@@ -111,7 +117,7 @@ export default function JournalPage({
       {/* paperclip + small photo */}
       <div style={{ position: "absolute", top: 110, right: 60, transform: "rotate(6deg)" }}>
         <div style={{ background: "#f7ecd4", padding: "8px 8px 22px", boxShadow: "0 8px 18px rgba(44,31,21,.2)", width: 130 }}>
-          <Photo src={leftPhotoUrl} style={{ width: "100%", aspectRatio: 1 }} />
+          <Photo src={leftPhotoUrl} slotId={leftSlotId} style={{ width: "100%", aspectRatio: 1 }} />
           <div className="f-script" style={{ position: "absolute", bottom: 4, left: 0, right: 0, textAlign: "center", fontSize: 13, color: "var(--ink-soft)" }}>
             {polaroidCaption || texts?.polaroidCaption || "Fushimi"}
           </div>
@@ -129,8 +135,8 @@ export default function JournalPage({
 
       {/* small photos stacked on right margin */}
       <div style={{ position: "absolute", top: 360, right: 60, width: 100, display: "flex", flexDirection: "column", gap: 6 }}>
-        <Photo src={topRightPhotoUrl} style={{ width: "100%", height: 70 }} />
-        <Photo src={bottomRightPhotoUrl} style={{ width: "100%", height: 70 }} />
+        <Photo src={topRightPhotoUrl} slotId={topRightSlotId} style={{ width: "100%", height: 70 }} />
+        <Photo src={bottomRightPhotoUrl} slotId={bottomRightSlotId} style={{ width: "100%", height: 70 }} />
       </div>
 
       {/* signature */}

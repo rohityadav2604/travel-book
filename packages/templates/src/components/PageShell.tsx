@@ -1,4 +1,5 @@
 import React from "react";
+import { useSlotAdjustment } from "./AdjustmentContext";
 /** Reusable page shell and photo wrapper ported from the Wanderbound design reference. */
 
 export function PageBg({ children }: { children: React.ReactNode }): React.ReactElement {
@@ -55,21 +56,32 @@ export function PageBg({ children }: { children: React.ReactNode }): React.React
 
 export type PhotoFit = "cover" | "contain" | "none";
 
+function getAdjustmentTransform(adj?: { offsetX: number; offsetY: number; zoom: number; rotation: number }): React.CSSProperties {
+  if (!adj) return {};
+  return {
+    transform: `translate(${adj.offsetX}%, ${adj.offsetY}%) scale(${adj.zoom}) rotate(${adj.rotation}deg)`,
+    transformOrigin: "center center",
+  };
+}
+
 export function Photo({
   src,
   style,
   className,
   fit = "cover",
   vintage = true,
+  slotId,
 }: {
   src: string | undefined;
   style?: React.CSSProperties;
   className?: string;
   fit?: PhotoFit;
   vintage?: boolean;
+  slotId?: string | undefined;
 }): React.ReactElement {
   const bgSize = fit === "contain" ? "contain" : fit === "none" ? "auto" : "cover";
   const bgRepeat = fit === "contain" || fit === "none" ? "no-repeat" : undefined;
+  const adjustment = useSlotAdjustment(slotId);
 
   return (
     <div
@@ -95,6 +107,7 @@ export function Photo({
               ? "saturate(.85) contrast(.95) sepia(.18) brightness(.98)"
               : "none",
             imageRendering: "auto",
+            ...getAdjustmentTransform(adjustment),
           }}
         />
       )}
@@ -106,6 +119,42 @@ export function Photo({
             background: "linear-gradient(180deg, rgba(255,200,140,.08), rgba(180,90,40,.10))",
             mixBlendMode: "overlay",
             pointerEvents: "none",
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Adjustable wrapper for native <img> tags. Renders inside an overflow-hidden container. */
+export function AdjustableImg({
+  src,
+  alt,
+  className,
+  style,
+  slotId,
+  imgStyle,
+}: {
+  src: string | undefined;
+  alt?: string;
+  className?: string;
+  style?: React.CSSProperties;
+  slotId?: string | undefined;
+  imgStyle?: React.CSSProperties;
+}): React.ReactElement {
+  const adjustment = useSlotAdjustment(slotId);
+
+  return (
+    <div className={className} style={{ position: "relative", overflow: "hidden", ...style }}>
+      {src && (
+        <img
+          src={src}
+          alt={alt || ""}
+          className="h-full w-full"
+          style={{
+            objectFit: "cover",
+            ...getAdjustmentTransform(adjustment),
+            ...imgStyle,
           }}
         />
       )}

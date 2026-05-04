@@ -3,7 +3,7 @@ import { PageBg, Photo } from "../components/PageShell";
 import { CoffeeStain, Stamp, PassportStamp, Botanical, Ticket } from "@memorybook/design/components/decorations";
 
 export type PolaroidWallProps = {
-  photos: { url: string | undefined; caption?: string }[];
+  photos: { url: string | undefined; caption?: string; slotId: string }[];
   texts?: Record<string, string> | undefined;
 };
 
@@ -35,11 +35,11 @@ const TAPE_GRADIENTS: Record<PolaroidConfig["tapeColor"], [string, string]> = {
 };
 
 export default function PolaroidWall({ photos, texts }: PolaroidWallProps): React.ReactElement {
-  const items: Array<{ url: string | undefined; caption?: string } & PolaroidConfig> = [];
+  const items: Array<{ url: string | undefined; caption?: string; slotId: string } & PolaroidConfig> = [];
   for (let i = 0; i < Math.min(photos.length, CONFIG.length); i++) {
     const photo = photos[i]!;
     const config = CONFIG[i]!;
-    const item: { url: string | undefined; caption?: string } & PolaroidConfig = { url: photo.url, ...config };
+    const item: { url: string | undefined; caption?: string; slotId: string } & PolaroidConfig = { url: photo.url, slotId: photo.slotId, ...config };
     if (photo.caption) item.caption = photo.caption;
     items.push(item);
   }
@@ -80,7 +80,7 @@ export default function PolaroidWall({ photos, texts }: PolaroidWallProps): Reac
                 position: "relative",
               }}
             >
-              <Photo src={p.url} style={{ position: "relative", width: "100%", aspectRatio: "1" }} />
+              <Photo src={p.url} slotId={p.slotId} style={{ position: "relative", width: "100%", aspectRatio: "1" }} />
               {p.caption && (
                 <div
                   className="f-script"

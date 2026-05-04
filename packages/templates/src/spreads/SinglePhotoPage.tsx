@@ -4,6 +4,7 @@ import { Flourish, Tape, PassportStamp } from "@memorybook/design/components/dec
 
 export type SinglePhotoPageProps = {
   photoUrl: string | undefined;
+  photoSlotId?: string;
   title?: string;
   date?: string;
   time?: string;
@@ -15,6 +16,7 @@ export type SinglePhotoPageProps = {
 
 export default function SinglePhotoPage({
   photoUrl,
+  photoSlotId,
   title,
   date,
   time,
@@ -53,7 +55,7 @@ export default function SinglePhotoPage({
             boxShadow: "0 1px 2px rgba(0,0,0,.1), 0 18px 40px rgba(44,31,21,.22)",
           }}
         >
-          <Photo src={photoUrl} style={{ position: "absolute", top: 14, left: 14, right: 14, bottom: 14 }} />
+          <Photo src={photoUrl} slotId={photoSlotId} style={{ position: "absolute", top: 14, left: 14, right: 14, bottom: 14 }} />
           <Tape width={64} color="terra" rotate={-8} style={{ position: "absolute", top: -10, left: 24 }} />
           <Tape width={64} color="terra" rotate={6} style={{ position: "absolute", top: -10, right: 24 }} />
         </div>

@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getTemplateTextFields, resolveTemplateTextValue } from "@memorybook/templates";
 import SpreadComposer from "@memorybook/templates/SpreadComposer";
+import type { PhotoAdjustment } from "@memorybook/templates";
 import { imageUrl } from "@/lib/imageUrl";
 
 type PhotoItem = {
@@ -21,7 +22,7 @@ type PhotoItem = {
 type SpreadData = {
   spreadId: string;
   templateName: string;
-  assignments: Array<{ slotId: string; photoId: string }>;
+  assignments: Array<{ slotId: string; photoId: string; adjustments?: PhotoAdjustment }>;
   slots?: Array<{ id: string; aspectRatioRange: { min: number; max: number }; sizeWeight: number }>;
   texts?: Record<string, string>;
 };
@@ -82,6 +83,129 @@ function ScaledPage({ children }: { children: React.ReactNode }): React.ReactEle
 }
 
 /* ------------------------------------------------------------------ */
+/*  Slide gesture overlay (drag to pan, wheel to zoom)                 */
+/* ------------------------------------------------------------------ */
+
+function SlideGestureOverlay({
+  selectedSlotId,
+  onAdjust,
+}: {
+  selectedSlotId: string;
+  onAdjust: (delta: Partial<PhotoAdjustment>) => void;
+}): React.ReactElement {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+  const lastPos = useRef({ x: 0, y: 0 });
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    dragging.current = true;
+    lastPos.current = { x: e.clientX, y: e.clientY };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!dragging.current) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const dx = e.clientX - lastPos.current.x;
+    const dy = e.clientY - lastPos.current.y;
+    lastPos.current = { x: e.clientX, y: e.clientY };
+
+    const rect = container.getBoundingClientRect();
+    const pctX = (dx / rect.width) * 100;
+    const pctY = (dy / rect.height) * 100;
+
+    onAdjust({ offsetX: pctX, offsetY: pctY });
+  }, [onAdjust]);
+
+  const handlePointerUp = useCallback(() => {
+    dragging.current = false;
+  }, []);
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY * -0.001;
+    onAdjust({ zoom: delta });
+  }, [onAdjust]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="absolute inset-0 z-10 cursor-move"
+      style={{ touchAction: "none" }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onWheel={handleWheel}
+      title={`Drag to pan · Scroll to zoom · Selected: ${selectedSlotId}`}
+    />
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Adjustment controls                                                */
+/* ------------------------------------------------------------------ */
+
+function AdjustmentControls({
+  adjustments,
+  onChange,
+}: {
+  adjustments?: PhotoAdjustment | undefined;
+  onChange: (delta: Partial<PhotoAdjustment>) => void;
+}): React.ReactElement {
+  const zoom = adjustments?.zoom ?? 1;
+  const rotation = adjustments?.rotation ?? 0;
+
+  return (
+    <div className="mt-3 space-y-3">
+      <div>
+        <div className="flex items-center justify-between">
+          <label className="font-mono text-[9px] uppercase tracking-wider text-ink-faded/70">Zoom</label>
+          <span className="font-mono text-[9px] text-ink-faded/60">{zoom.toFixed(2)}×</span>
+        </div>
+        <input
+          type="range"
+          min={0.5}
+          max={3}
+          step={0.05}
+          value={zoom}
+          onChange={(e) => onChange({ zoom: parseFloat(e.target.value) - zoom })}
+          className="mt-1 w-full accent-terracotta-deep"
+        />
+      </div>
+      <div>
+        <div className="flex items-center justify-between">
+          <label className="font-mono text-[9px] uppercase tracking-wider text-ink-faded/70">Rotation</label>
+          <span className="font-mono text-[9px] text-ink-faded/60">{Math.round(rotation)}°</span>
+        </div>
+        <input
+          type="range"
+          min={-180}
+          max={180}
+          step={1}
+          value={rotation}
+          onChange={(e) => onChange({ rotation: parseFloat(e.target.value) })}
+          className="mt-1 w-full accent-terracotta-deep"
+        />
+      </div>
+      <button
+        onClick={() =>
+          onChange({
+            offsetX: -(adjustments?.offsetX ?? 0),
+            offsetY: -(adjustments?.offsetY ?? 0),
+            zoom: 1 - zoom,
+            rotation: 0,
+          })
+        }
+        className="rounded border border-ink-faded/20 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-ink-faded transition-colors hover:border-terracotta-deep hover:text-terracotta-deep"
+      >
+        Reset
+      </button>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Edit sidebar                                                       */
 /* ------------------------------------------------------------------ */
 
@@ -94,6 +218,7 @@ function EditSidebar({
   onReplaceSlotPhoto,
   onUpdateText,
   onUpdateCaption,
+  onAdjust,
   onSave,
   onDiscard,
   saving,
@@ -108,6 +233,7 @@ function EditSidebar({
   onReplaceSlotPhoto: (target: SelectedSlot, photoId: string) => void;
   onUpdateText: (spreadIndex: number, key: string, value: string) => void;
   onUpdateCaption: (photoId: string, caption: string) => void;
+  onAdjust: (spreadIndex: number, slotId: string, delta: Partial<PhotoAdjustment>) => void;
   onSave: () => void;
   onDiscard: () => void;
   saving: boolean;
@@ -298,6 +424,19 @@ function EditSidebar({
               onChange={(e) => onUpdateCaption(selectedPhoto.id, e.target.value)}
               placeholder="Add a caption..."
               className="mt-2 w-full rounded border border-ink-faded/20 bg-paper px-3 py-2 font-script text-sm text-ink placeholder:text-ink-faded/40 focus:border-terracotta-deep focus:outline-none"
+            />
+          </section>
+        )}
+
+        {selectedSlot && selectedSlot.spreadIndex === currentIdx && (
+          <section className="mt-6 border-t border-ink-faded/10 pt-5">
+            <h4 className="font-mono text-[10px] uppercase tracking-widest text-ink-faded">Position & Zoom</h4>
+            <p className="mt-1 font-serif text-sm italic text-ink-faded/70">
+              Drag the slide to pan. Scroll to zoom.
+            </p>
+            <AdjustmentControls
+              adjustments={currentSpread?.assignments.find((a) => a.slotId === selectedSlot.slotId)?.adjustments}
+              onChange={(delta) => onAdjust(currentIdx, selectedSlot.slotId, delta)}
             />
           </section>
         )}
@@ -558,15 +697,19 @@ export default function BookPage(): React.ReactElement {
     (spread: SpreadData | undefined) => {
       const s: Record<string, string | undefined> = {};
       const c: Record<string, string> = {};
-      if (!spread) return { slots: s, captions: c };
+      const a: Record<string, PhotoAdjustment> = {};
+      if (!spread) return { slots: s, captions: c, adjustments: a };
 
-      for (const a of spread.assignments) {
-        const photo = photoMap.get(a.photoId);
+      for (const asgn of spread.assignments) {
+        const photo = photoMap.get(asgn.photoId);
         if (photo) {
-          s[a.slotId] = imageUrl("public", photo.thumbnailKey);
+          s[asgn.slotId] = imageUrl("public", photo.thumbnailKey);
           if (photo.caption) {
-            c[a.slotId] = photo.caption;
+            c[asgn.slotId] = photo.caption;
           }
+        }
+        if (asgn.adjustments) {
+          a[asgn.slotId] = asgn.adjustments;
         }
       }
 
@@ -576,7 +719,7 @@ export default function BookPage(): React.ReactElement {
         }
       }
 
-      return { slots: s, captions: c };
+      return { slots: s, captions: c, adjustments: a };
     },
     [photoMap]
   );
@@ -735,6 +878,25 @@ export default function BookPage(): React.ReactElement {
     });
   }, []);
 
+  const handleAdjust = useCallback((spreadIndex: number, slotId: string, delta: Partial<PhotoAdjustment>) => {
+    setDraftBook((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev);
+      const spread = next.placementJson?.[spreadIndex];
+      if (!spread) return prev;
+      const assignment = spread.assignments.find((a) => a.slotId === slotId);
+      if (!assignment) return prev;
+      if (!assignment.adjustments) {
+        assignment.adjustments = { offsetX: 0, offsetY: 0, zoom: 1, rotation: 0 };
+      }
+      if (delta.offsetX !== undefined) assignment.adjustments.offsetX += delta.offsetX;
+      if (delta.offsetY !== undefined) assignment.adjustments.offsetY += delta.offsetY;
+      if (delta.zoom !== undefined) assignment.adjustments.zoom = Math.min(3, Math.max(0.5, assignment.adjustments.zoom + delta.zoom));
+      if (delta.rotation !== undefined) assignment.adjustments.rotation = delta.rotation;
+      return next;
+    });
+  }, []);
+
   const handleSave = useCallback(async () => {
     if (!book || !draftBook) return;
     setSaving(true);
@@ -787,6 +949,21 @@ export default function BookPage(): React.ReactElement {
     setDraftBook(structuredClone(book));
     setSelectedSlot(null);
   }, [book]);
+
+  /* ------------------ Auto-save ------------------ */
+
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!hasChanges || !book || !draftBook) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => {
+      void handleSave();
+    }, 1500);
+    return () => {
+      if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    };
+  }, [hasChanges, book, draftBook, handleSave]);
 
   /* ------------------ Render ------------------ */
 
@@ -866,8 +1043,9 @@ export default function BookPage(): React.ReactElement {
             <div className="slider-track" ref={sliderRef}>
               {spreads.map((spread, i) => {
                 const template = resolveTemplate(spread);
-                const { slots, captions } = buildSpreadData(spread);
+                const { slots, captions, adjustments } = buildSpreadData(spread);
                 const isFlashing = swapFlash?.spreadIndex === i;
+                const isAdjusting = editMode && selectedSlot?.spreadIndex === i;
 
                 return (
                   <div
@@ -884,8 +1062,21 @@ export default function BookPage(): React.ReactElement {
                         }}
                       >
                         <ScaledPage>
-                          <SpreadComposer theme={draftBook.theme} templateName={template} slots={slots} captions={captions} />
+                          <SpreadComposer
+                            theme={draftBook.theme}
+                            templateName={template}
+                            slots={slots}
+                            captions={captions}
+                            adjustments={adjustments}
+                            onAdjust={(slotId, delta) => handleAdjust(i, slotId, delta)}
+                          />
                         </ScaledPage>
+                        {isAdjusting && selectedSlot && (
+                          <SlideGestureOverlay
+                            selectedSlotId={selectedSlot.slotId}
+                            onAdjust={(delta) => handleAdjust(i, selectedSlot.slotId, delta)}
+                          />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -920,6 +1111,7 @@ export default function BookPage(): React.ReactElement {
             onReplaceSlotPhoto={handleReplaceSlotPhoto}
             onUpdateText={handleUpdateText}
             onUpdateCaption={handleUpdateCaption}
+            onAdjust={handleAdjust}
             onSave={handleSave}
             onDiscard={handleDiscard}
             saving={saving}

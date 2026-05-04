@@ -3,7 +3,7 @@ import { PageBg, Photo } from "../components/PageShell";
 import { Flourish, PostageMark, Botanical } from "@memorybook/design/components/decorations";
 
 export type PhotoJournalProps = {
-  photos: Array<{ url: string | undefined; caption?: string }>;
+  photos: Array<{ url: string | undefined; caption?: string; slotId: string }>;
   title?: string;
   header?: string;
   date?: string;
@@ -45,7 +45,7 @@ export default function PhotoJournal({
       <div style={{ position: "absolute", top: 170, left: 60, width: 240, display: "flex", flexDirection: "column", gap: 14 }}>
         {leftPhotos.map((p, i) => (
           <div key={i}>
-            <Photo src={p.url} style={{ width: "100%", aspectRatio: i === 0 ? "4/3" : "4/5" }} />
+            <Photo src={p.url} slotId={p.slotId} style={{ width: "100%", aspectRatio: i === 0 ? "4/3" : "4/5" }} />
             <div className="f-script" style={{ fontSize: 16, color: "var(--ink-soft)", textAlign: "center", marginTop: -6 }}>
               {p.caption || ""}
             </div>

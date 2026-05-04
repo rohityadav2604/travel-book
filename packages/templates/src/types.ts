@@ -16,9 +16,17 @@ export type SpreadDef = {
   slots: SlotDef[];
 };
 
+export type PhotoAdjustment = {
+  offsetX: number; // percent, default 0
+  offsetY: number; // percent, default 0
+  zoom: number; // default 1
+  rotation: number; // degrees, default 0
+};
+
 export type Assignment = {
   slotId: string;
   photoId: string;
+  adjustments?: PhotoAdjustment;
 };
 
 export type PlacementResult = {

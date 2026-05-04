@@ -4,6 +4,7 @@ import { Compass, HandDrawnMap, Tape, PassportStamp, Botanical } from "@memorybo
 
 export type MapPageProps = {
   photoUrl: string | undefined;
+  photoSlotId?: string;
   caption: string | undefined;
   texts?: Record<string, string> | undefined;
 };

@@ -2,9 +2,17 @@ import { db } from "@memorybook/db";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+const adjustmentSchema = z.object({
+  offsetX: z.number(),
+  offsetY: z.number(),
+  zoom: z.number(),
+  rotation: z.number(),
+});
+
 const assignmentSchema = z.object({
   slotId: z.string().min(1),
   photoId: z.string().min(1),
+  adjustments: adjustmentSchema.optional(),
 });
 
 const slotSchema = z.object({

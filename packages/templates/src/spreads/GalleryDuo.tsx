@@ -3,7 +3,9 @@ import { PageBg, Photo } from "../components/PageShell";
 
 export type GalleryDuoProps = {
   leftUrl: string | undefined;
+  leftSlotId?: string;
   rightUrl: string | undefined;
+  rightSlotId?: string;
   leftCaption?: string | undefined;
   rightCaption?: string | undefined;
   title?: string | undefined;
@@ -12,7 +14,9 @@ export type GalleryDuoProps = {
 
 export default function GalleryDuo({
   leftUrl,
+  leftSlotId,
   rightUrl,
+  rightSlotId,
   leftCaption,
   rightCaption,
   title,
@@ -68,6 +72,7 @@ export default function GalleryDuo({
       >
         <Photo
           src={leftUrl}
+          slotId={leftSlotId}
           fit="contain"
           vintage={false}
           style={{
@@ -93,6 +98,7 @@ export default function GalleryDuo({
       >
         <Photo
           src={rightUrl}
+          slotId={rightSlotId}
           fit="contain"
           vintage={false}
           style={{

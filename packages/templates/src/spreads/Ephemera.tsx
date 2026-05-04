@@ -3,7 +3,7 @@ import { PageBg } from "../components/PageShell";
 import { Flourish, CoffeeStain, Stamp, Ticket } from "@memorybook/design/components/decorations";
 
 export type EphemeraProps = {
-  photos: (string | undefined)[];
+  photos: { url: string | undefined; slotId: string }[];
   texts?: Record<string, string> | undefined;
 };
 

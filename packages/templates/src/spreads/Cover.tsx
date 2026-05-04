@@ -4,15 +4,16 @@ import { Flourish, Stamp, PassportStamp, CoffeeStain, Botanical } from "@memoryb
 
 export type CoverProps = {
   heroUrl: string | undefined;
+  heroSlotId?: string;
   title: string | undefined;
   date: string | undefined;
   texts?: Record<string, string> | undefined;
 };
 
-export default function Cover({ heroUrl, title, date, texts }: CoverProps): React.ReactElement {
+export default function Cover({ heroUrl, heroSlotId, title, date, texts }: CoverProps): React.ReactElement {
   return (
     <PageBg>
-      {heroUrl && <Photo src={heroUrl} style={{ position: "absolute", inset: 0 }} />}
+      {heroUrl && <Photo src={heroUrl} slotId={heroSlotId} style={{ position: "absolute", inset: 0 }} />}
       {/* warm vignette */}
       <div
         style={{

@@ -1,4 +1,5 @@
 import React from "react";
+import { useSlotAdjustment } from "../../../components/AdjustmentContext";
 
 export function HPageBg({
   children,
@@ -64,15 +65,27 @@ export function HPageBg({
   );
 }
 
+function getAdjustmentTransform(adj?: { offsetX: number; offsetY: number; zoom: number; rotation: number }): React.CSSProperties {
+  if (!adj) return {};
+  return {
+    transform: `translate(${adj.offsetX}%, ${adj.offsetY}%) scale(${adj.zoom}) rotate(${adj.rotation}deg)`,
+    transformOrigin: "center center",
+  };
+}
+
 export function HPhoto({
   src,
   style,
   archival,
+  slotId,
 }: {
   src: string | undefined;
   style?: React.CSSProperties;
   archival?: boolean;
+  slotId?: string | undefined;
 }): React.ReactElement {
+  const adjustment = useSlotAdjustment(slotId);
+
   return (
     <div
       style={{
@@ -92,6 +105,7 @@ export function HPhoto({
             backgroundSize: "cover",
             backgroundPosition: "center",
             filter: "contrast(.95) saturate(.85)",
+            ...getAdjustmentTransform(adjustment),
           }}
         />
       )}

@@ -4,20 +4,23 @@ import { AnimalTracks } from "@memorybook/design/components/highland";
 
 export type HighlandJournalProps = {
   leftPhotoUrl: string | undefined;
+  leftSlotId?: string;
   topRightPhotoUrl: string | undefined;
+  topRightSlotId?: string;
   bottomRightPhotoUrl: string | undefined;
+  bottomRightSlotId?: string;
   quote?: string | undefined;
   date?: string | undefined;
   texts?: Record<string, string> | undefined;
 };
 
-export default function HighlandJournal({ leftPhotoUrl, quote, date, texts }: HighlandJournalProps): React.ReactElement {
+export default function HighlandJournal({ leftPhotoUrl, leftSlotId, quote, date, texts }: HighlandJournalProps): React.ReactElement {
   const sightingsLines = (texts?.sightingsBody ?? "chamois · 1   raven · 4\nibex sign · yes   wolf · no").split("\n");
 
   return (
     <HPageBg>
       <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: 260 }}>
-        <HPhoto src={leftPhotoUrl} style={{ width: "100%", height: "100%" }} />
+        <HPhoto src={leftPhotoUrl} slotId={leftSlotId} style={{ width: "100%", height: "100%" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(20,30,25,.2), rgba(20,30,25,.5))" }} />
         <div style={{ position: "absolute", top: 50, left: 24, right: 24, color: "#ecebe2" }}>
           <div className="m-caps" style={{ fontSize: 9, opacity: 0.9, letterSpacing: ".35em" }}>{texts?.dayLabel ?? "DAY 9"}</div>

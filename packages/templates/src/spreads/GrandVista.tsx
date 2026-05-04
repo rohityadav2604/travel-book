@@ -3,15 +3,16 @@ import { PageBg, Photo } from "../components/PageShell";
 
 export type GrandVistaProps = {
   photoUrl: string | undefined;
+  photoSlotId?: string;
   caption: string | undefined;
   subtitle?: string | undefined;
   texts?: Record<string, string> | undefined;
 };
 
-export default function GrandVista({ photoUrl, caption, subtitle, texts }: GrandVistaProps): React.ReactElement {
+export default function GrandVista({ photoUrl, photoSlotId, caption, subtitle, texts }: GrandVistaProps): React.ReactElement {
   return (
     <PageBg>
-      <Photo src={photoUrl} style={{ position: "absolute", inset: 0 }} />
+      <Photo src={photoUrl} slotId={photoSlotId} style={{ position: "absolute", inset: 0 }} />
 
       {/* dark gradient at bottom for text */}
       <div

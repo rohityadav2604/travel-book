@@ -10,7 +10,7 @@ export type HighlandQuoteProps = {
 export default function HighlandQuote({ quote, caption, texts }: HighlandQuoteProps): React.ReactElement {
   return (
     <HPageBg variant="dark">
-      <HPhoto src={undefined} style={{ position: "absolute", inset: 0, opacity: 0 }} />
+      <HPhoto src={undefined} slotId={undefined} style={{ position: "absolute", inset: 0, opacity: 0 }} />
       <div
         style={{
           position: "absolute",

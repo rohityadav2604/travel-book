@@ -1,4 +1,4 @@
-import type { SpreadDef } from "../types";
+import type { PhotoAdjustment, SpreadDef } from "../types";
 import type { ComponentType } from "react";
 
 export type SpreadComposerProps = {
@@ -6,6 +6,8 @@ export type SpreadComposerProps = {
   slots: Record<string, string | undefined>;
   captions: Record<string, string> | undefined;
   theme?: string | undefined;
+  adjustments?: Record<string, PhotoAdjustment> | undefined;
+  onAdjust?: ((slotId: string, delta: Partial<PhotoAdjustment>) => void) | undefined;
 };
 
 export interface ThemeTailwindConfig {

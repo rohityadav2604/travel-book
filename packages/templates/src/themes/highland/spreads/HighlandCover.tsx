@@ -4,15 +4,16 @@ import { MountainSilhouette, MCompass } from "@memorybook/design/components/high
 
 export type HighlandCoverProps = {
   heroUrl: string | undefined;
+  heroSlotId?: string;
   title: string | undefined;
   date: string | undefined;
   texts?: Record<string, string> | undefined;
 };
 
-export default function HighlandCover({ heroUrl, title, date, texts }: HighlandCoverProps): React.ReactElement {
+export default function HighlandCover({ heroUrl, heroSlotId, title, date, texts }: HighlandCoverProps): React.ReactElement {
   return (
     <HPageBg variant="dark">
-      {heroUrl && <HPhoto src={heroUrl} style={{ position: "absolute", inset: 0, opacity: 0.55 }} />}
+      {heroUrl && <HPhoto src={heroUrl} slotId={heroSlotId} style={{ position: "absolute", inset: 0, opacity: 0.55 }} />}
       <div
         style={{
           position: "absolute",
