@@ -8,6 +8,7 @@ import { imageUrl } from "@/lib/imageUrl";
 export type BookData = {
   id: string;
   title: string | null;
+  theme: string;
   status: string;
   placementJson: Array<{
     spreadId: string;
@@ -260,7 +261,7 @@ export default function BookPage(): React.ReactElement {
                   <div className="slider-page">
                     <div className="page-frame">
                       <ScaledPage>
-                        <SpreadComposer templateName={template} slots={slots} captions={captions} />
+                        <SpreadComposer theme={book?.theme} templateName={template} slots={slots} captions={captions} />
                       </ScaledPage>
                     </div>
                   </div>

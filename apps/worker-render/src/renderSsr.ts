@@ -9,6 +9,7 @@ export type SsrRenderInput = {
   width: number;
   height: number;
   quality: "print" | "screen";
+  theme?: string;
 };
 
 export function renderSpreadToHtml(input: SsrRenderInput): string {
@@ -16,6 +17,7 @@ export function renderSpreadToHtml(input: SsrRenderInput): string {
     templateName: input.templateName,
     slots: input.slots,
     captions: input.captions,
+    theme: input.theme,
   });
 
   const bodyHtml = ReactDOMServer.renderToStaticMarkup(element);

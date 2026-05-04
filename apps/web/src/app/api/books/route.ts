@@ -5,6 +5,7 @@ import { z } from "zod";
 
 const createSchema = z.object({
   sessionId: z.string().min(1),
+  theme: z.enum(["wanderbound", "highland", "city"]).default("wanderbound"),
 });
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -15,7 +16,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  const { sessionId } = parsed.data;
+  const { sessionId, theme } = parsed.data;
 
   const includedPhotos = await db.photo.findMany({
     where: { sessionId, excluded: false },
@@ -32,6 +33,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const book = await db.book.create({
     data: {
       sessionId,
+      theme,
       status: "placing",
     },
   });
@@ -41,6 +43,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     kind: "placement",
     sessionId,
     bookId: book.id,
+    theme,
   });
   await queue.close();
 

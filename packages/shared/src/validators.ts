@@ -51,6 +51,7 @@ export const placementJobPayloadSchema = z.object({
   kind: z.literal("placement"),
   sessionId: z.string().min(1),
   bookId: z.string().min(1),
+  theme: z.enum(["wanderbound", "highland", "city"]).default("wanderbound"),
 });
 
 export const renderJobPayloadSchema = z.object({

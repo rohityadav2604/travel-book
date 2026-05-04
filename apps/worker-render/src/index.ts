@@ -107,12 +107,12 @@ async function processRenderJob(
       for (const a of placement.assignments) {
         const photo = photoMap.get(a.photoId);
         // Use original storageKey for print quality; fallback to thumbnailKey
-        const imageKey = payload.quality === "print" && photo?.storageKey
-          ? photo.storageKey
-          : photo?.thumbnailKey;
+        const useOriginal = payload.quality === "print" && !!photo?.storageKey;
+        const imageKey = useOriginal ? photo.storageKey : photo?.thumbnailKey;
+        const bucket = useOriginal ? "raw" : "public";
         if (imageKey) {
-          const dataUri = await fetchImageAsDataUri("public", imageKey);
-          slots[a.slotId] = dataUri ?? getPublicUrl("public", imageKey);
+          const dataUri = await fetchImageAsDataUri(bucket, imageKey);
+          slots[a.slotId] = dataUri ?? getPublicUrl(bucket, imageKey);
         }
         if (photo?.caption) {
           captions[a.slotId] = photo.caption;
@@ -128,9 +128,10 @@ async function processRenderJob(
         width,
         height,
         quality: payload.quality,
+        theme: book.theme,
       });
 
-      const buffer = await renderSpread({ html, width, height, quality: payload.quality });
+      const buffer = await renderSpread({ html, width, height, quality: payload.quality, theme: book.theme });
       spreadBuffers.push(buffer);
     }
 

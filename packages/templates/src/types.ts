@@ -34,3 +34,5 @@ export type PhotoInput = {
   pinned: boolean;
   displayOrder: number;
 };
+
+export type BookTheme = "wanderbound" | "highland" | "city";

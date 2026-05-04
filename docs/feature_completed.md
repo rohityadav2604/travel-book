@@ -357,3 +357,37 @@
 ## M7 — Launch
 
 <!-- No M7 features completed yet -->
+
+---
+
+## Post-M7 — Theme Selection System
+
+- [x] THEME-01 · P0 · Multi-theme book architecture [fe] [api] [worker] [design]
+      Acceptance: Theme registry supports N themes; each theme owns spreads, composer, tokens, and render styles; Wanderbound (default), Highland (nature), and City (placeholder) registered
+      Depends: M5-06
+      Files: packages/templates/src/themes/*, packages/design/src/tokens/highland.ts, packages/design/src/components/highland/*
+      Done: 2026-05-04 · commit pending
+
+- [x] THEME-02 · P0 · Highland theme port [design] [fe]
+      Acceptance: Highland Mountain Book design system ported into monorepo: 6 spread components (Cover, Hero, Grid, Journal, Quote, BackCover), custom decorations (compass, fern, topo map, etc.), distinct color palette and typography
+      Depends: THEME-01
+      Files: packages/templates/src/themes/highland/*, packages/design/src/components/highland/*
+      Done: 2026-05-04 · commit pending
+
+- [x] THEME-03 · P0 · Theme preview API [api]
+      Acceptance: POST /api/preview returns 2 representative spreads with user's actual photos placed via aspect-ratio matcher for any selected theme; stateless, no DB writes
+      Depends: THEME-01, M2-03
+      Files: apps/web/src/app/api/preview/route.ts
+      Done: 2026-05-04 · commit pending
+
+- [x] THEME-04 · P0 · Theme selection UI with live preview [fe]
+      Acceptance: /select-theme page shows theme cards (Wanderbound, Highland, City placeholder); clicking a theme fetches preview and renders 2 spreads with user's photos at reduced scale; CTA creates book with selected theme
+      Depends: THEME-03, M2-04
+      Files: apps/web/src/app/select-theme/page.tsx, apps/web/src/app/select-theme/SelectThemePage.tsx
+      Done: 2026-05-04 · commit pending
+
+- [x] THEME-05 · P0 · End-to-end theme flow integration [fe] [api] [worker]
+      Acceptance: Review page CTA navigates to /select-theme; Book creation API accepts theme; placement engine uses theme-specific spread catalog; renderer injects theme CSS and fonts; existing Wanderbound books remain backward-compatible
+      Depends: THEME-01, THEME-04, M5-06
+      Files: apps/web/src/app/review/page.tsx, apps/web/src/app/api/books/route.ts, apps/web/src/app/book/[id]/page.tsx, apps/worker-upload/src/placementJob.ts, apps/worker-render/src/*
+      Done: 2026-05-04 · commit pending

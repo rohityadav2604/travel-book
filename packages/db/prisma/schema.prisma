@@ -61,6 +61,7 @@ model Book {
   id            String     @id @default(cuid())
   sessionId     String
   title         String?
+  theme         String     @default("wanderbound")
   placementJson Json?
   printPdfKey   String?
   screenPdfKey  String?

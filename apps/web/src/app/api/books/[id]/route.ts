@@ -29,6 +29,7 @@ export async function GET(
     book: {
       id: book.id,
       title: book.title,
+      theme: book.theme,
       status: book.status,
       placementJson: book.placementJson,
       photos: book.session.photos.map((p) => ({
