@@ -98,17 +98,21 @@ async function processRenderJob(
     const photoMap = new Map(book.session.photos.map((p) => [p.id, p]));
     const spreadBuffers: Buffer[] = [];
 
-    const width = payload.quality === "print" ? 1200 : 600;
-    const height = payload.quality === "print" ? 1200 : 600;
+    const width = payload.quality === "print" ? 2400 : 600;
+    const height = payload.quality === "print" ? 2400 : 600;
 
     for (const placement of placements) {
       const slots: Record<string, string | undefined> = {};
       const captions: Record<string, string> = {};
       for (const a of placement.assignments) {
         const photo = photoMap.get(a.photoId);
-        if (photo?.thumbnailKey) {
-          const dataUri = await fetchImageAsDataUri("public", photo.thumbnailKey);
-          slots[a.slotId] = dataUri ?? getPublicUrl("public", photo.thumbnailKey);
+        // Use original storageKey for print quality; fallback to thumbnailKey
+        const imageKey = payload.quality === "print" && photo?.storageKey
+          ? photo.storageKey
+          : photo?.thumbnailKey;
+        if (imageKey) {
+          const dataUri = await fetchImageAsDataUri("public", imageKey);
+          slots[a.slotId] = dataUri ?? getPublicUrl("public", imageKey);
         }
         if (photo?.caption) {
           captions[a.slotId] = photo.caption;

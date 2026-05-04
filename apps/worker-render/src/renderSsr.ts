@@ -20,7 +20,7 @@ export function renderSpreadToHtml(input: SsrRenderInput): string {
 
   const bodyHtml = ReactDOMServer.renderToStaticMarkup(element);
 
-  const scale = input.quality === "print" ? 2 : 1;
+  const scale = input.quality === "print" ? 4 : 1;
 
   return `<div style="width:${input.width / scale}px;height:${input.height / scale}px;transform:scale(${scale});transform-origin:top left;">
     ${bodyHtml}

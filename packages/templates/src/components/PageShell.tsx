@@ -53,15 +53,24 @@ export function PageBg({ children }: { children: React.ReactNode }): React.React
   );
 }
 
+export type PhotoFit = "cover" | "contain" | "none";
+
 export function Photo({
   src,
   style,
   className,
+  fit = "cover",
+  vintage = true,
 }: {
   src: string | undefined;
   style?: React.CSSProperties;
   className?: string;
+  fit?: PhotoFit;
+  vintage?: boolean;
 }): React.ReactElement {
+  const bgSize = fit === "contain" ? "contain" : fit === "none" ? "auto" : "cover";
+  const bgRepeat = fit === "contain" || fit === "none" ? "no-repeat" : undefined;
+
   return (
     <div
       style={{
@@ -79,21 +88,27 @@ export function Photo({
             position: "absolute",
             inset: 0,
             backgroundImage: `url(${src})`,
-            backgroundSize: "cover",
+            backgroundSize: bgSize,
             backgroundPosition: "center",
-            filter: "saturate(.85) contrast(.95) sepia(.18) brightness(.98)",
+            backgroundRepeat: bgRepeat,
+            filter: vintage
+              ? "saturate(.85) contrast(.95) sepia(.18) brightness(.98)"
+              : "none",
+            imageRendering: "auto",
           }}
         />
       )}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "linear-gradient(180deg, rgba(255,200,140,.08), rgba(180,90,40,.10))",
-          mixBlendMode: "overlay",
-          pointerEvents: "none",
-        }}
-      />
+      {vintage && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(180deg, rgba(255,200,140,.08), rgba(180,90,40,.10))",
+            mixBlendMode: "overlay",
+            pointerEvents: "none",
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -16,6 +16,8 @@ import IndexPage from "./spreads/IndexPage";
 import SinglePhotoPage from "./spreads/SinglePhotoPage";
 import PhotoGrid from "./spreads/PhotoGrid";
 import PhotoJournal from "./spreads/PhotoJournal";
+import HeroFocus from "./spreads/HeroFocus";
+import GalleryDuo from "./spreads/GalleryDuo";
 
 export type SpreadComposerProps = {
   templateName: string;
@@ -143,6 +145,26 @@ export default function SpreadComposer({ templateName, slots, captions = undefin
       if (captions?.title) pjProps.title = captions.title;
       return <PhotoJournal {...pjProps} />;
     }
+
+    case "HeroFocus":
+      return (
+        <HeroFocus
+          photoUrl={slots.hero || slots.left || slots.photo}
+          caption={opt(captions?.caption || captions?.hero)}
+          subtitle={opt(captions?.subtitle)}
+        />
+      );
+
+    case "GalleryDuo":
+      return (
+        <GalleryDuo
+          leftUrl={slots.left || slots[`photo-0`]}
+          rightUrl={slots.right || slots[`photo-1`]}
+          leftCaption={opt(captions?.left || captions?.[`photo-0`])}
+          rightCaption={opt(captions?.right || captions?.[`photo-1`])}
+          title={opt(captions?.title)}
+        />
+      );
 
     default:
       return (
