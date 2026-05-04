@@ -6,7 +6,9 @@ import { z } from "zod";
 
 const previewSchema = z.object({
   sessionId: z.string().min(1),
-  theme: z.enum(["wanderbound", "highland", "city"]).default("wanderbound"),
+  theme: z.string().min(1).refine((id) => {
+    try { getTheme(id); return true; } catch { return false; }
+  }, { message: "Unknown theme" }),
 });
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -20,7 +22,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const { sessionId, theme } = parsed.data;
 
   const photos = await db.photo.findMany({
-    where: { sessionId, excluded: false },
+    where: { sessionId, excluded: false, status: "ready" },
     orderBy: { displayOrder: "asc" },
   });
 

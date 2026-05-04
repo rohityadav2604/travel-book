@@ -6,15 +6,34 @@ export type JournalPageProps = {
   leftPhotoUrl: string | undefined;
   topRightPhotoUrl: string | undefined;
   bottomRightPhotoUrl: string | undefined;
-  quote: string | undefined;
   date: string | undefined;
+  weather?: string | undefined;
+  location?: string | undefined;
+  body?: string | undefined;
+  body2?: string | undefined;
+  polaroidCaption?: string | undefined;
+  signature?: string | undefined;
 };
 
 export default function JournalPage({
   leftPhotoUrl,
   topRightPhotoUrl,
   bottomRightPhotoUrl,
+  date,
+  weather,
+  location,
+  body,
+  body2,
+  polaroidCaption,
+  signature,
 }: JournalPageProps): React.ReactElement {
+  const bodyText =
+    body ||
+    "Today began before the sun did. We climbed Fushimi Inari while the gates were still wet from morning rain, and the foxes seemed to watch us from every shrine. M. counted 412 torii before she stopped counting. I lost count somewhere around the seventh switchback, when I sat on a stone bench and ate a peach so ripe it stained my journal. I have left the page in. It looks like a sunset.";
+  const secondBodyText =
+    body2 ||
+    "We took the slow train back. A boy across the aisle offered me a paper crane. I am keeping it here, between this page and the next.";
+
   return (
     <PageBg>
       {/* ruled lines */}
@@ -58,10 +77,10 @@ export default function JournalPage({
         }}
       >
         <div className="f-script" style={{ fontSize: 22, color: "var(--ink-soft)", whiteSpace: "nowrap" }}>
-          Tuesday, the 16th
+          {date || "Tuesday, the 16th"}
         </div>
         <div className="f-mono" style={{ fontSize: 8, color: "var(--ink-faded)", letterSpacing: ".15em", whiteSpace: "nowrap" }}>
-          FAIR & WINDY
+          {weather || "FAIR & WINDY"}
         </div>
       </div>
 
@@ -69,7 +88,7 @@ export default function JournalPage({
         className="f-display"
         style={{ position: "absolute", top: 92, left: 80, fontSize: 28, fontStyle: "italic", color: "var(--terracotta-deep)" }}
       >
-        Kyoto, evening
+        {location || "Kyoto, evening"}
       </div>
 
       {/* journal text */}
@@ -78,10 +97,10 @@ export default function JournalPage({
           className="f-script dropcap"
           style={{ fontSize: 21, lineHeight: 1.33, color: "var(--ink-soft)", margin: 0, textWrap: "pretty" }}
         >
-          Today began before the sun did. We climbed Fushimi Inari while the gates were still wet from morning rain, and the foxes seemed to watch us from every shrine. M. counted 412 torii before she stopped counting. I lost count somewhere around the seventh switchback, when I sat on a stone bench and ate a peach so ripe it stained my journal. I have left the page in. It looks like a sunset.
+          {bodyText}
         </p>
         <p className="f-script" style={{ fontSize: 21, lineHeight: 1.33, color: "var(--ink-soft)", marginTop: 16, textWrap: "pretty" }}>
-          We took the slow train back. A boy across the aisle offered me a paper crane. I am keeping it here, between this page and the next.
+          {secondBodyText}
         </p>
       </div>
 
@@ -90,7 +109,7 @@ export default function JournalPage({
         <div style={{ background: "#f7ecd4", padding: "8px 8px 22px", boxShadow: "0 8px 18px rgba(44,31,21,.2)", width: 130 }}>
           <Photo src={leftPhotoUrl} style={{ width: "100%", aspectRatio: 1 }} />
           <div className="f-script" style={{ position: "absolute", bottom: 4, left: 0, right: 0, textAlign: "center", fontSize: 13, color: "var(--ink-soft)" }}>
-            Fushimi
+            {polaroidCaption || "Fushimi"}
           </div>
         </div>
         {/* paperclip */}
@@ -112,7 +131,7 @@ export default function JournalPage({
 
       {/* signature */}
       <div style={{ position: "absolute", bottom: 60, right: 100 }}>
-        <div className="f-script" style={{ fontSize: 28, color: "var(--ink)", transform: "rotate(-4deg)" }}>— E.</div>
+        <div className="f-script" style={{ fontSize: 28, color: "var(--ink)", transform: "rotate(-4deg)" }}>{signature || "— E."}</div>
       </div>
 
       <PassportStamp city="KYOTO" date="16·X·74" shape="circle" color="burgundy" rotate={12} style={{ position: "absolute", bottom: 130, left: 50 }} />

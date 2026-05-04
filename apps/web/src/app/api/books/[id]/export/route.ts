@@ -1,4 +1,5 @@
 import { db } from "@memorybook/db";
+import { addRenderJob, createRenderQueue } from "@memorybook/shared/queue";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -16,6 +17,36 @@ export async function GET(
   }
 
   if (!book.printPdfKey && !book.screenPdfKey) {
+    if (book.status === "ready") {
+      await db.book.update({
+        where: { id },
+        data: { status: "rendering" },
+      });
+
+      const queue = createRenderQueue();
+      try {
+        await addRenderJob(queue, "render", {
+          kind: "render",
+          bookId: id,
+          quality: "print",
+        });
+      } catch {
+        await db.book.update({
+          where: { id },
+          data: { status: "ready" },
+        });
+        return NextResponse.json({ error: "Could not queue export" }, { status: 503 });
+      } finally {
+        await queue.close();
+      }
+
+      return NextResponse.json({ printUrl: null, screenUrl: null, status: "rendering" }, { status: 202 });
+    }
+
+    if (book.status === "rendering") {
+      return NextResponse.json({ printUrl: null, screenUrl: null, status: "rendering" }, { status: 202 });
+    }
+
     return NextResponse.json({ error: "Book not ready for export" }, { status: 404 });
   }
 

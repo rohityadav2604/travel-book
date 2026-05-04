@@ -5,6 +5,9 @@ import HighlandGrid from "./spreads/HighlandGrid";
 import HighlandJournal from "./spreads/HighlandJournal";
 import HighlandQuote from "./spreads/HighlandQuote";
 import HighlandBackCover from "./spreads/HighlandBackCover";
+import MosaicGrid from "../../spreads/MosaicGrid";
+import StorySpread from "../../spreads/StorySpread";
+import GroupPhotoSpread from "../../spreads/GroupPhotoSpread";
 import type { SpreadComposerProps } from "../registry";
 
 function opt<T>(value: T | undefined): T | undefined {
@@ -54,6 +57,34 @@ export default function HighlandComposer({ templateName, slots, captions = undef
 
     case "HighlandBackCover":
       return <HighlandBackCover brand={opt(captions?.brand)} />;
+
+    case "MosaicGrid": {
+      const mosaicPhotos = Object.entries(slots).map(([k, url]) => {
+        const cap = captions?.[k];
+        return cap ? { url, caption: cap } : { url };
+      });
+      return <MosaicGrid photos={mosaicPhotos} />;
+    }
+
+    case "StorySpread":
+      return (
+        <StorySpread
+          accentUrl={slots.accent}
+          title={opt(captions?.title)}
+          body={opt(captions?.body || captions?.caption)}
+          author={opt(captions?.author)}
+          date={opt(captions?.date)}
+        />
+      );
+
+    case "GroupPhotoSpread":
+      return (
+        <GroupPhotoSpread
+          photoUrl={slots.hero}
+          caption={opt(captions?.caption || captions?.hero)}
+          subtitle={opt(captions?.subtitle)}
+        />
+      );
 
     default:
       return (

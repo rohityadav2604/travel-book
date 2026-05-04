@@ -1,8 +1,8 @@
 import type { SpreadDef } from "../../types";
+import { buildDynamicSpreads, MOSAIC_GRID_CAPACITY } from "../../lib/buildDynamicSpreads";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function buildHighlandSpreads(_photoCount?: number): SpreadDef[] {
-  const spreads: SpreadDef[] = [
+export function buildHighlandSpreads(photoCount: number): SpreadDef[] {
+  const bodySpreads: SpreadDef[] = [
     { id: "cover", templateName: "HighlandCover", slots: [] },
     { id: "spread-1", templateName: "HighlandHero", slots: [{ id: "hero", aspectRatioRange: { min: 1.2, max: 2.5 }, sizeWeight: 2 }] },
     { id: "spread-2", templateName: "HighlandGrid", slots: [
@@ -15,8 +15,12 @@ export function buildHighlandSpreads(_photoCount?: number): SpreadDef[] {
       { id: "topRight", aspectRatioRange: { min: 1.2, max: 2.0 }, sizeWeight: 0.8 },
       { id: "bottomRight", aspectRatioRange: { min: 1.2, max: 2.0 }, sizeWeight: 0.8 },
     ]},
+  ];
+
+  const endingSpreads: SpreadDef[] = [
     { id: "spread-4", templateName: "HighlandQuote", slots: [] },
     { id: "spread-5", templateName: "HighlandBackCover", slots: [] },
   ];
-  return spreads;
+
+  return buildDynamicSpreads(bodySpreads, photoCount, "MosaicGrid", MOSAIC_GRID_CAPACITY, endingSpreads);
 }

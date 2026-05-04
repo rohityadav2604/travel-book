@@ -25,6 +25,8 @@ export type PlacementResult = {
   spreadId: string;
   templateName: string;
   assignments: Assignment[];
+  slots?: SlotDef[];
+  texts?: Record<string, string>;
 };
 
 export type PhotoInput = {
@@ -35,4 +37,4 @@ export type PhotoInput = {
   displayOrder: number;
 };
 
-export type BookTheme = "wanderbound" | "highland" | "city";
+export type BookTheme = string;

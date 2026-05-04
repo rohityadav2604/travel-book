@@ -18,6 +18,9 @@ import PhotoGrid from "../../spreads/PhotoGrid";
 import PhotoJournal from "../../spreads/PhotoJournal";
 import HeroFocus from "../../spreads/HeroFocus";
 import GalleryDuo from "../../spreads/GalleryDuo";
+import MosaicGrid from "../../spreads/MosaicGrid";
+import StorySpread from "../../spreads/StorySpread";
+import GroupPhotoSpread from "../../spreads/GroupPhotoSpread";
 import type { SpreadComposerProps } from "../registry";
 
 function opt<T>(value: T | undefined): T | undefined {
@@ -27,7 +30,7 @@ function opt<T>(value: T | undefined): T | undefined {
 export default function WanderboundComposer({ templateName, slots, captions = undefined }: SpreadComposerProps): React.ReactElement {
   switch (templateName) {
     case "GrandVista":
-      return <GrandVista photoUrl={slots.hero} caption={opt(captions?.hero)} />;
+      return <GrandVista photoUrl={slots.hero} caption={opt(captions?.hero)} subtitle={opt(captions?.subtitle)} />;
 
     case "JournalPage":
       return (
@@ -35,8 +38,13 @@ export default function WanderboundComposer({ templateName, slots, captions = un
           leftPhotoUrl={slots.left}
           topRightPhotoUrl={slots.topRight}
           bottomRightPhotoUrl={slots.bottomRight}
-          quote={opt(captions?.quote)}
           date={opt(captions?.date)}
+          weather={opt(captions?.weather)}
+          location={opt(captions?.location)}
+          body={opt(captions?.body || captions?.quote)}
+          body2={opt(captions?.body2)}
+          polaroidCaption={opt(captions?.polaroidCaption)}
+          signature={opt(captions?.signature)}
         />
       );
 
@@ -158,6 +166,34 @@ export default function WanderboundComposer({ templateName, slots, captions = un
           leftCaption={opt(captions?.left || captions?.[`photo-0`])}
           rightCaption={opt(captions?.right || captions?.[`photo-1`])}
           title={opt(captions?.title)}
+        />
+      );
+
+    case "MosaicGrid": {
+      const mosaicPhotos = Object.entries(slots).map(([k, url]) => {
+        const cap = captions?.[k];
+        return cap ? { url, caption: cap } : { url };
+      });
+      return <MosaicGrid photos={mosaicPhotos} />;
+    }
+
+    case "StorySpread":
+      return (
+        <StorySpread
+          accentUrl={slots.accent}
+          title={opt(captions?.title)}
+          body={opt(captions?.body || captions?.caption)}
+          author={opt(captions?.author)}
+          date={opt(captions?.date)}
+        />
+      );
+
+    case "GroupPhotoSpread":
+      return (
+        <GroupPhotoSpread
+          photoUrl={slots.hero}
+          caption={opt(captions?.caption || captions?.hero)}
+          subtitle={opt(captions?.subtitle)}
         />
       );
 

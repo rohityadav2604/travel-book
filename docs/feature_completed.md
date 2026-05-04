@@ -278,21 +278,19 @@
       Files: packages/templates/src/spreads/ChapterDivider.tsx, apps/worker-upload/src/placementJob.ts (divider logic)
       Done: 2026-05-03 · commit pending
 
-- [~] M4-06 · P1 · Inline caption editing [fe]
+- [x] M4-06 · P1 · Inline caption editing [fe]
       PRD: §6.5.3
       Acceptance: tapping any caption area enters contenteditable mode; changes auto-saved client-side; PATCH /api/books/{id}/captions persists; changes reflected when PDF is generated
       Depends: M3-07
-      Files: apps/web/src/components/CaptionEditor.tsx, apps/web/src/app/api/books/[id]/captions/route.ts
-      Note: UI supports captions prop; full editing deferred to v1.1
-      Done: 2026-05-03 · commit pending
+      Files: apps/web/src/app/book/[id]/page.tsx, apps/web/src/app/api/sessions/[id]/photos/[photoId]/route.ts
+      Done: 2026-05-05 · commit pending
 
-- [~] M4-07 · P1 · Book title editing [fe]
+- [x] M4-07 · P1 · Book title editing [fe]
       PRD: §6.5.3
       Acceptance: tapping the cover title enters inline edit; PATCH /api/books/{id} persists new title; reflected in PDF export
       Depends: M4-04, M4-06
-      Files: apps/web/src/components/BookViewer.tsx (cover title overlay)
-      Note: Cover template accepts title prop; inline editing deferred to v1.1
-      Done: 2026-05-03 · commit pending
+      Files: apps/web/src/app/book/[id]/page.tsx, apps/web/src/app/api/books/[id]/route.ts
+      Done: 2026-05-05 · commit pending
 
 ---
 
@@ -391,3 +389,25 @@
       Depends: THEME-01, THEME-04, M5-06
       Files: apps/web/src/app/review/page.tsx, apps/web/src/app/api/books/route.ts, apps/web/src/app/book/[id]/page.tsx, apps/worker-upload/src/placementJob.ts, apps/worker-render/src/*
       Done: 2026-05-04 · commit pending
+
+---
+
+## Post-M7 — Book Editor & Library
+
+- [x] EDITOR-01 · P0 · Book edit mode with cross-spread photo swap [fe]
+      Acceptance: Edit button toggles editor sidebar; user can select a photo slot and click another slot (any spread) to swap assignments; swap updates placementJson client-side and persists via PATCH /api/books/{id}
+      Depends: M3-07, M4-06
+      Files: apps/web/src/app/book/[id]/page.tsx
+      Done: 2026-05-05 · commit pending
+
+- [x] EDITOR-02 · P0 · Spread text & label editor [fe]
+      Acceptance: Editor sidebar shows key-value inputs for each spread's text overrides; new keys can be added; values merge with photo captions and flow into existing template caption props without template changes
+      Depends: EDITOR-01
+      Files: apps/web/src/app/book/[id]/page.tsx, packages/templates/src/types.ts, packages/templates/src/matcher.ts
+      Done: 2026-05-05 · commit pending
+
+- [x] EDITOR-03 · P0 · Session-scoped book library [fe] [api]
+      Acceptance: GET /api/books returns all books for the current anonymous session; /library page displays book cards with title, theme, status, and creation date; navigation links added to home page and book viewer
+      Depends: M0-06, M3-07
+      Files: apps/web/src/app/api/books/route.ts, apps/web/src/app/library/page.tsx, apps/web/src/components/BookCard.tsx, apps/web/src/app/page.tsx, apps/web/src/app/book/[id]/page.tsx
+      Done: 2026-05-05 · commit pending

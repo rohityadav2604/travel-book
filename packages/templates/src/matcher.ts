@@ -77,7 +77,15 @@ export function assignPhotosToSpreads(
       }
     }
 
-    results.push({ spreadId: spread.id, templateName: spread.templateName, assignments });
+    results.push({ spreadId: spread.id, templateName: spread.templateName, assignments, slots: spread.slots, texts: {} });
+  }
+
+  const totalSlots = spreads.reduce((sum, s) => sum + s.slots.length, 0);
+  if (photos.length > totalSlots) {
+    throw new Error(
+      `Placement failed: ${photos.length} photos but only ${totalSlots} slots available. ` +
+      `Spread builder did not generate enough spreads for the photo count.`,
+    );
   }
 
   return results;

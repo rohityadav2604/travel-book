@@ -14,5 +14,16 @@ export type SpreadComposerProps = {
 export default function SpreadComposer({ templateName, slots, captions, theme = "wanderbound" }: SpreadComposerProps): React.ReactElement {
   const themeModule = getTheme(theme);
   const ThemeComposer = themeModule.SpreadComposer;
-  return <ThemeComposer templateName={templateName} slots={slots} captions={captions} />;
+  const note = captions?.note;
+
+  return (
+    <div className="relative h-full w-full">
+      <ThemeComposer templateName={templateName} slots={slots} captions={captions} />
+      {note && (
+        <div className="pointer-events-none absolute bottom-8 left-8 max-w-[260px] -rotate-2 bg-paper/85 px-4 py-2 font-script text-2xl leading-tight text-ink shadow-md">
+          {note}
+        </div>
+      )}
+    </div>
+  );
 }

@@ -4,9 +4,10 @@ import { PageBg, Photo } from "../components/PageShell";
 export type GrandVistaProps = {
   photoUrl: string | undefined;
   caption: string | undefined;
+  subtitle?: string | undefined;
 };
 
-export default function GrandVista({ photoUrl, caption }: GrandVistaProps): React.ReactElement {
+export default function GrandVista({ photoUrl, caption, subtitle }: GrandVistaProps): React.ReactElement {
   return (
     <PageBg>
       <Photo src={photoUrl} style={{ position: "absolute", inset: 0 }} />
@@ -72,7 +73,7 @@ export default function GrandVista({ photoUrl, caption }: GrandVistaProps): Reac
           {caption || "The first sight of the sea"}
         </h2>
         <div className="f-script" style={{ fontSize: 26, opacity: 0.92 }}>
-          — somewhere south of here, dawn —
+          {subtitle || "— somewhere south of here, dawn —"}
         </div>
       </div>
 

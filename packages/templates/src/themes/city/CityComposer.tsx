@@ -1,21 +1,62 @@
 import React from "react";
+import CityCover from "./spreads/CityCover";
+import CityHero from "./spreads/CityHero";
+import CityMap from "./spreads/CityMap";
+import MosaicGrid from "../../spreads/MosaicGrid";
+import StorySpread from "../../spreads/StorySpread";
+import GroupPhotoSpread from "../../spreads/GroupPhotoSpread";
 import type { SpreadComposerProps } from "../registry";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function CityComposer(_props: SpreadComposerProps): React.ReactElement {
-  return (
-    <div className="flex h-full w-full items-center justify-center" style={{ background: "#1c2025" }}>
-      <div style={{ textAlign: "center", color: "#a8b0b0", padding: "0 40px" }}>
-        <div style={{ fontFamily: "'Inter Tight', sans-serif", fontSize: 11, letterSpacing: ".3em", textTransform: "uppercase", marginBottom: 16 }}>
-          Coming Soon
+function opt<T>(value: T | undefined): T | undefined {
+  return value;
+}
+
+export default function CityComposer({ templateName, slots, captions = undefined }: SpreadComposerProps): React.ReactElement {
+  switch (templateName) {
+    case "CityCover":
+      return <CityCover heroUrl={slots.hero} title={opt(captions?.title)} date={opt(captions?.date)} />;
+
+    case "CityHero":
+      return <CityHero photoUrl={slots.hero} caption={opt(captions?.caption || captions?.hero)} subtitle={opt(captions?.subtitle)} />;
+
+    case "CityMap":
+      return <CityMap photoUrl={slots.hero} caption={opt(captions?.caption)} />;
+
+    case "MosaicGrid": {
+      const mosaicPhotos = Object.entries(slots).map(([k, url]) => {
+        const cap = captions?.[k];
+        return cap ? { url, caption: cap } : { url };
+      });
+      return <MosaicGrid photos={mosaicPhotos} />;
+    }
+
+    case "StorySpread":
+      return (
+        <StorySpread
+          accentUrl={slots.accent}
+          title={opt(captions?.title)}
+          body={opt(captions?.body || captions?.caption)}
+          author={opt(captions?.author)}
+          date={opt(captions?.date)}
+        />
+      );
+
+    case "GroupPhotoSpread":
+      return (
+        <GroupPhotoSpread
+          photoUrl={slots.hero}
+          caption={opt(captions?.caption || captions?.hero)}
+          subtitle={opt(captions?.subtitle)}
+        />
+      );
+
+    default:
+      return (
+        <div className="flex h-full w-full items-center justify-center" style={{ background: "#1c2025" }}>
+          <p className="text-xs uppercase" style={{ fontFamily: "'Inter Tight', sans-serif", letterSpacing: ".3em", color: "#4a5560" }}>
+            Unknown template: {templateName}
+          </p>
         </div>
-        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 42, fontWeight: 300, fontStyle: "italic", lineHeight: 1.1, color: "#ecebe2" }}>
-          City Lights
-        </h2>
-        <p style={{ fontFamily: "'Source Serif 4', serif", fontSize: 14, marginTop: 12, opacity: 0.7 }}>
-          Urban architecture, neon, and concrete.<br />This theme is under construction.
-        </p>
-      </div>
-    </div>
-  );
+      );
+  }
 }

@@ -6,7 +6,7 @@ import type { PlacementJobPayload } from "@memorybook/shared/validators";
 
 export async function processPlacementJob(payload: PlacementJobPayload): Promise<void> {
   const photos = await db.photo.findMany({
-    where: { sessionId: payload.sessionId, excluded: false },
+    where: { sessionId: payload.sessionId, excluded: false, status: "ready" },
     orderBy: { displayOrder: "asc" },
   });
 

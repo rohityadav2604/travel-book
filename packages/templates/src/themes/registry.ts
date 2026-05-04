@@ -8,6 +8,12 @@ export type SpreadComposerProps = {
   theme?: string | undefined;
 };
 
+export interface ThemeTailwindConfig {
+  colors: string;
+  fonts: string;
+  bodyBackground: string;
+}
+
 export interface ThemeModule {
   id: string;
   name: string;
@@ -17,6 +23,7 @@ export interface ThemeModule {
   SpreadComposer: ComponentType<SpreadComposerProps>;
   renderStyles: (quality: "print" | "screen") => string;
   fonts: string[];
+  tailwindConfig: ThemeTailwindConfig;
 }
 
 const registry = new Map<string, ThemeModule>();

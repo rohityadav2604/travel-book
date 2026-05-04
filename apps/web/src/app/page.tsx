@@ -14,16 +14,16 @@ export default function HomePage(): React.ReactElement {
         </p>
         <div className="mt-10 flex flex-wrap gap-3">
           <a
-            className="rounded border border-terracotta-deep bg-terracotta-deep px-5 py-3 font-sans text-sm uppercase tracking-[0.2em] text-paper"
+            className="rounded border border-terracotta-deep bg-terracotta-deep px-5 py-3 font-sans text-sm uppercase tracking-[0.2em] text-paper transition-colors hover:bg-terracotta"
             href="/upload"
           >
             Start a Book
           </a>
           <a
-            className="rounded border border-ink-faded px-5 py-3 font-sans text-sm uppercase tracking-[0.2em] text-ink-soft"
-            href="/api/health"
+            className="rounded border border-ink-faded px-5 py-3 font-sans text-sm uppercase tracking-[0.2em] text-ink-soft transition-colors hover:border-terracotta-deep hover:text-terracotta-deep"
+            href="/library"
           >
-            Health
+            My Books
           </a>
         </div>
       </section>

@@ -1,8 +1,8 @@
 import type { SpreadDef } from "../../types";
+import { buildDynamicSpreads, MOSAIC_GRID_CAPACITY } from "../../lib/buildDynamicSpreads";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function buildWanderboundSpreads(_photoCount?: number): SpreadDef[] {
-  const spreads: SpreadDef[] = [
+export function buildWanderboundSpreads(photoCount: number): SpreadDef[] {
+  const bodySpreads: SpreadDef[] = [
     // Opening spreads (no photos)
     { id: "cover", templateName: "Cover", slots: [] },
     { id: "spread-1", templateName: "InsideFront", slots: [] },
@@ -71,13 +71,14 @@ export function buildWanderboundSpreads(_photoCount?: number): SpreadDef[] {
 
     // Map page with optional hero
     { id: "spread-13", templateName: "MapPage", slots: [{ id: "hero", aspectRatioRange: { min: 1.0, max: 2.0 }, sizeWeight: 1 }] },
+  ];
 
-    // Palette cleansers (no photos)
+  const endingSpreads: SpreadDef[] = [
     { id: "spread-14", templateName: "Ephemera", slots: [] },
     { id: "spread-15", templateName: "QuotePage", slots: [] },
     { id: "spread-16", templateName: "InsideBack", slots: [] },
     { id: "spread-17", templateName: "BackCover", slots: [] },
   ];
 
-  return spreads;
+  return buildDynamicSpreads(bodySpreads, photoCount, "MosaicGrid", MOSAIC_GRID_CAPACITY, endingSpreads);
 }

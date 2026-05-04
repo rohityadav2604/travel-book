@@ -93,6 +93,7 @@ async function processRenderJob(
       spreadId: string;
       templateName: string;
       assignments: Array<{ slotId: string; photoId: string }>;
+      texts?: Record<string, string>;
     }>;
 
     const photoMap = new Map(book.session.photos.map((p) => [p.id, p]));
@@ -116,6 +117,11 @@ async function processRenderJob(
         }
         if (photo?.caption) {
           captions[a.slotId] = photo.caption;
+        }
+      }
+      for (const [key, value] of Object.entries(placement.texts ?? {})) {
+        if (value) {
+          captions[key] = value;
         }
       }
 
