@@ -9,8 +9,8 @@ export default function HomePage(): React.ReactElement {
           Travel books with a worn-in journal soul.
         </h1>
         <p className="mt-6 max-w-2xl font-serif text-2xl leading-8 text-ink-soft">
-          Upload 5 to 50 travel photos, review the sequence, and render a warm vintage
-          photo-book preview ready for export.
+          Upload 5 to 50 travel photos, review the sequence, and craft a warm vintage
+          photo-book preview.
         </p>
         <div className="mt-10 flex flex-wrap gap-3">
           <a

@@ -582,13 +582,6 @@ export default function BookPage(): React.ReactElement {
   const [book, setBook] = useState<BookData | null>(null);
   const [draftBook, setDraftBook] = useState<BookData | null>(null);
   const [idx, setIdx] = useState(0);
-  const [exportOpen, setExportOpen] = useState(false);
-  const [exportUrls, setExportUrls] = useState<{
-    printUrl: string | null;
-    screenUrl: string | null;
-    status?: string;
-    error?: string;
-  } | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<SelectedSlot | null>(null);
   const [saving, setSaving] = useState(false);
@@ -671,12 +664,6 @@ export default function BookPage(): React.ReactElement {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev, editMode]);
-
-  const downloadExport = useCallback(async () => {
-    const res = await fetch(`/api/books/${bookId}/export`);
-    const data = await res.json();
-    setExportUrls(data);
-  }, [bookId]);
 
   const photoMap = useMemo(() => new Map(draftBook?.photos.map((p) => [p.id, p]) ?? []), [draftBook]);
 
@@ -938,7 +925,6 @@ export default function BookPage(): React.ReactElement {
       setBook(data.book);
       setDraftBook(data.book);
       setSelectedSlot(null);
-      setExportUrls(null);
     } finally {
       setSaving(false);
     }
@@ -1124,75 +1110,6 @@ export default function BookPage(): React.ReactElement {
         )}
       </div>
 
-      {/* Download button - floating */}
-      {!editMode && (
-        <button
-          onClick={() => setExportOpen(true)}
-          className="fixed right-6 top-1/2 z-40 -translate-y-1/2 rounded-full border px-4 py-3 f-mono text-[10px] uppercase tracking-widest transition-all hover:scale-105"
-          style={{
-            borderColor: "rgba(243,231,209,.25)",
-            color: "rgba(243,231,209,.7)",
-            background: "rgba(243,231,209,.06)",
-            writingMode: "vertical-rl",
-            textOrientation: "mixed",
-          }}
-        >
-          Download
-        </button>
-      )}
-
-      {/* Export modal */}
-      {exportOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(12,8,5,.65)" }}>
-          <div className="w-full max-w-md rounded p-6" style={{ background: "#f3e7d1", boxShadow: "0 30px 60px rgba(0,0,0,.5)" }}>
-            <h2 className="f-display text-2xl italic" style={{ color: "#2c1f15" }}>
-              Download your book
-            </h2>
-            <div className="mt-4 space-y-3">
-              {exportUrls?.printUrl ? (
-                <a
-                  href={exportUrls.printUrl}
-                  download
-                  className="block rounded px-4 py-3 text-center f-sans text-sm uppercase tracking-wider text-paper"
-                  style={{ background: "#8b3a1e" }}
-                >
-                  Download Print PDF
-                </a>
-              ) : (
-                <>
-                  <button
-                    onClick={downloadExport}
-                    className="block w-full rounded border px-4 py-3 text-center f-sans text-sm uppercase tracking-wider"
-                    style={{ borderColor: "#6b4f3a", color: "#4a3526" }}
-                  >
-                    {exportUrls?.status === "rendering" ? "Rendering - Check Again" : "Prepare Export"}
-                  </button>
-                  {exportUrls?.error && (
-                    <p className="text-center font-serif text-sm text-burgundy">{exportUrls.error}</p>
-                  )}
-                </>
-              )}
-              {exportUrls?.screenUrl && (
-                <a
-                  href={exportUrls.screenUrl}
-                  download
-                  className="block rounded border px-4 py-3 text-center f-sans text-sm uppercase tracking-wider"
-                  style={{ borderColor: "#6b4f3a", color: "#4a3526" }}
-                >
-                  Download Screen PDF
-                </a>
-              )}
-            </div>
-            <button
-              onClick={() => setExportOpen(false)}
-              className="mt-4 w-full rounded border py-2 f-sans text-xs uppercase tracking-wider"
-              style={{ borderColor: "rgba(107,79,58,.3)", color: "#6b4f3a" }}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
