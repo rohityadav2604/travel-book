@@ -572,7 +572,7 @@ export default function BookPage(): React.ReactElement {
 
       if (spread.texts) {
         for (const [key, value] of Object.entries(spread.texts)) {
-          if (value) c[key] = value;
+          c[key] = value;
         }
       }
 
