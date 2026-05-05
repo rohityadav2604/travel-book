@@ -589,6 +589,8 @@ export default function BookPage(): React.ReactElement {
 
   const sliderRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const isProgrammaticScrollRef = useRef(false);
+  const scrollTimeoutRef = useRef<number | null>(null);
 
   const fetchBook = useCallback(async () => {
     if (!bookId) return;
@@ -606,6 +608,13 @@ export default function BookPage(): React.ReactElement {
 
   const spreads = draftBook?.placementJson ?? [];
 
+  // Stable ref callbacks so React doesn't null them on every render
+  const slideRefCallbacks = useMemo(() => {
+    return spreads.map((_, i) => (el: HTMLDivElement | null) => {
+      slideRefs.current[i] = el;
+    });
+  }, [spreads.length]);
+
   // IntersectionObserver to track which slide is centered
   useEffect(() => {
     const slider = sliderRef.current;
@@ -613,6 +622,7 @@ export default function BookPage(): React.ReactElement {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (isProgrammaticScrollRef.current) return;
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const i = Number(entry.target.getAttribute("data-index"));
@@ -633,13 +643,29 @@ export default function BookPage(): React.ReactElement {
   }, [spreads.length]);
 
   const scrollToIndex = useCallback((targetIdx: number) => {
-    const slider = sliderRef.current;
-    const slide = slideRefs.current[targetIdx];
-    if (!slider || !slide) return;
-    const sliderRect = slider.getBoundingClientRect();
-    const slideRect = slide.getBoundingClientRect();
-    const scrollLeft = slider.scrollLeft + slideRect.left - sliderRect.left - (sliderRect.width - slideRect.width) / 2;
-    slider.scrollTo({ left: scrollLeft, behavior: "smooth" });
+    const maxIdx = spreads.length - 1;
+    if (maxIdx < 0) return;
+
+    const clampedIdx = Math.min(Math.max(targetIdx, 0), maxIdx);
+    const slide = slideRefs.current[clampedIdx];
+    if (!slide) return;
+    if (scrollTimeoutRef.current) {
+      window.clearTimeout(scrollTimeoutRef.current);
+    }
+    isProgrammaticScrollRef.current = true;
+    setIdx(clampedIdx);
+    slide.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    scrollTimeoutRef.current = window.setTimeout(() => {
+      isProgrammaticScrollRef.current = false;
+    }, 600);
+  }, [spreads.length]);
+
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        window.clearTimeout(scrollTimeoutRef.current);
+      }
+    };
   }, []);
 
   const next = useCallback(() => {
@@ -1042,7 +1068,7 @@ export default function BookPage(): React.ReactElement {
                     key={spread.spreadId}
                     className={`slider-item ${i === idx ? "active" : ""}`}
                     data-index={i}
-                    ref={(el) => { slideRefs.current[i] = el; }}
+                    ref={slideRefCallbacks[i]}
                   >
                     <div className="slider-page">
                       <div
