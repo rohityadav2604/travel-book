@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Spain route and tile motif">
+  <path d="M38 64 C58 45 91 38 124 49 C150 58 164 82 158 110 C153 134 132 139 123 158 C111 149 91 151 78 139 C62 124 39 125 32 103 C27 87 27 74 38 64 Z" fill="#cf4b2c" opacity=".16" stroke="#8f2c18" stroke-width="5"/>
+  <path d="M58 116 C78 96 104 95 124 74 C137 61 150 61 163 66" fill="none" stroke="#245f8f" stroke-width="5" stroke-linecap="round"/>
+  <path d="M56 55 L76 55 L76 75 L56 75 Z M99 43 L119 43 L119 63 L99 63 Z M126 126 L146 126 L146 146 L126 146 Z" fill="none" stroke="#d7a329" stroke-width="4" opacity=".8"/>
+</svg>

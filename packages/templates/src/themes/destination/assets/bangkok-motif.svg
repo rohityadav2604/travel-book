@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Bangkok temple and river motif">
+  <path d="M28 136 C58 108 85 139 110 103 C130 75 150 78 174 55" fill="none" stroke="#d9a441" stroke-width="8" stroke-linecap="round" opacity=".75"/>
+  <path d="M72 136 H128 L118 82 L100 48 L82 82 Z" fill="none" stroke="#a45d22" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M62 136 H138 M80 84 H120 M88 70 H112" stroke="#a45d22" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="154" cy="52" r="16" fill="#d9476f" opacity=".55"/>
+</svg>

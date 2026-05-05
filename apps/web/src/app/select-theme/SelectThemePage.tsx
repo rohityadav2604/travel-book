@@ -38,6 +38,7 @@ export default function SelectThemePage(): React.ReactElement {
   const sessionId = searchParams.get("session");
 
   const themes = listThemes();
+  const unavailableThemeIds = new Set<string>();
   const [selectedTheme, setSelectedTheme] = useState<string>("wanderbound");
   const [preview, setPreview] = useState<PreviewSpread[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -121,33 +122,37 @@ export default function SelectThemePage(): React.ReactElement {
 
       {/* Theme Cards */}
       <section className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-        {themes.map((theme) => (
-          <button
-            key={theme.id}
-            onClick={() => handleSelectTheme(theme.id)}
-            disabled={theme.id === "city"}
-            className={`relative rounded-lg border p-6 text-left transition-all ${
-              selectedTheme === theme.id
-                ? "border-terracotta-deep ring-2 ring-terracotta-deep/20"
-                : "border-ink-faded/20 hover:border-ink-faded/40"
-            } ${theme.id === "city" ? "cursor-not-allowed opacity-60" : ""}`}
-            style={{
-              background: selectedTheme === theme.id ? "rgba(243,231,209,.5)" : "transparent",
-            }}
-          >
-            <div
-              className="mb-4 h-24 w-full rounded"
-              style={{ background: theme.previewColor }}
-            />
-            <h3 className="font-display text-2xl italic text-ink">{theme.name}</h3>
-            <p className="mt-2 font-serif text-sm text-ink-soft">{theme.description}</p>
-            {theme.id === "city" && (
-              <span className="mt-2 inline-block rounded bg-ink-faded/10 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-ink-faded">
-                Coming Soon
-              </span>
-            )}
-          </button>
-        ))}
+        {themes.map((theme) => {
+          const isUnavailable = unavailableThemeIds.has(theme.id);
+
+          return (
+            <button
+              key={theme.id}
+              onClick={() => handleSelectTheme(theme.id)}
+              disabled={isUnavailable}
+              className={`relative rounded-lg border p-6 text-left transition-all ${
+                selectedTheme === theme.id
+                  ? "border-terracotta-deep ring-2 ring-terracotta-deep/20"
+                  : "border-ink-faded/20 hover:border-ink-faded/40"
+              } ${isUnavailable ? "cursor-not-allowed opacity-60" : ""}`}
+              style={{
+                background: selectedTheme === theme.id ? "rgba(243,231,209,.5)" : "transparent",
+              }}
+            >
+              <div
+                className="mb-4 h-24 w-full rounded"
+                style={{ background: theme.previewColor }}
+              />
+              <h3 className="font-display text-2xl italic text-ink">{theme.name}</h3>
+              <p className="mt-2 font-serif text-sm text-ink-soft">{theme.description}</p>
+              {isUnavailable && (
+                <span className="mt-2 inline-block rounded bg-ink-faded/10 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-ink-faded">
+                  Coming Soon
+                </span>
+              )}
+            </button>
+          );
+        })}
       </section>
 
       {/* Preview Area */}
@@ -192,11 +197,11 @@ export default function SelectThemePage(): React.ReactElement {
       <div className="mt-12">
         <button
           onClick={createBook}
-          disabled={creating || selectedTheme === "city"}
+          disabled={creating || unavailableThemeIds.has(selectedTheme)}
           className={`
             rounded px-8 py-4 font-sans text-sm uppercase tracking-[0.2em] transition-colors
             ${
-              !creating && selectedTheme !== "city"
+              !creating && !unavailableThemeIds.has(selectedTheme)
                 ? "border border-terracotta-deep bg-terracotta-deep text-paper hover:bg-terracotta"
                 : "cursor-not-allowed border border-ink-faded bg-paper-2 text-ink-faded"
             }

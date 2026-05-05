@@ -738,6 +738,10 @@ export default function BookPage(): React.ReactElement {
       CityCover: "· Cover",
       CityHero: "· Hero",
       CityMap: "· Map",
+      DestinationCover: "· Destination Cover",
+      DestinationHero: "· Destination Hero",
+      DestinationScrapbook: "· Scrapbook",
+      DestinationMap: "· Route Map",
     };
     return labels[t] ?? t;
   };

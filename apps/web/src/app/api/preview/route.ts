@@ -4,7 +4,7 @@ import { getTheme } from "@memorybook/templates/themes/registry";
 // Register themes (side-effect) so getTheme works
 import "@memorybook/templates/themes/wanderbound/index";
 import "@memorybook/templates/themes/highland/index";
-import "@memorybook/templates/themes/city/index";
+import "@memorybook/templates/themes/destination/index";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 

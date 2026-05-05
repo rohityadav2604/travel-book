@@ -21,12 +21,20 @@ export interface ThemeModule {
   name: string;
   description: string;
   previewColor: string;
+  assetCredits?: AssetCredit[];
   buildSpreads: (photoCount: number) => SpreadDef[];
   SpreadComposer: ComponentType<SpreadComposerProps>;
   renderStyles: (quality: "print" | "screen") => string;
   fonts: string[];
   tailwindConfig: ThemeTailwindConfig;
 }
+
+export type AssetCredit = {
+  label: string;
+  sourceUrl: string;
+  license: "CC0" | "Public Domain";
+  usage: string;
+};
 
 const registry = new Map<string, ThemeModule>();
 

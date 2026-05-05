@@ -14,7 +14,9 @@ export default function BookCard({ id, title, theme, status, createdAt }: BookCa
   const themeColors: Record<string, string> = {
     wanderbound: "#c89441",
     highland: "#4f5028",
-    city: "#3f6b6b",
+    bangkok: "#d9a441",
+    paris: "#a33a35",
+    spain: "#cf4b2c",
   };
 
   const themeColor = themeColors[theme] ?? "#c89441";
