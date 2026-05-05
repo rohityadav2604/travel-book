@@ -46,6 +46,22 @@ type UsedPhotoLocation = SelectedSlot & {
   spreadLabel: string;
 };
 
+type SaveStatus = "idle" | "saving" | "saved" | "error";
+type SaveSource = "manual" | "auto";
+
+function hasBookChanges(saved: BookData, draft: BookData): boolean {
+  if (saved.title !== draft.title) return true;
+  if (JSON.stringify(saved.placementJson) !== JSON.stringify(draft.placementJson)) return true;
+  if (JSON.stringify(saved.photos) !== JSON.stringify(draft.photos)) return true;
+  return false;
+}
+
+function isKeyboardInputTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+  return Boolean(target.closest("input, textarea, select, button, [contenteditable='true'], [role='textbox']"));
+}
+
 function ScaledPage({ children }: { children: React.ReactNode }): React.ReactElement {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -221,7 +237,7 @@ function EditSidebar({
   onAdjust,
   onSave,
   onDiscard,
-  saving,
+  saveStatus,
   hasChanges,
   onClose,
 }: {
@@ -236,7 +252,7 @@ function EditSidebar({
   onAdjust: (spreadIndex: number, slotId: string, delta: Partial<PhotoAdjustment>) => void;
   onSave: () => void;
   onDiscard: () => void;
-  saving: boolean;
+  saveStatus: SaveStatus;
   hasChanges: boolean;
   onClose: () => void;
 }): React.ReactElement {
@@ -296,6 +312,25 @@ function EditSidebar({
   const selectedSlotLabel = selectedSlot
     ? `Page ${String(selectedSlot.spreadIndex + 1).padStart(2, "0")} / ${selectedSlot.slotId}`
     : "Choose a slot first";
+  const saving = saveStatus === "saving";
+  const saveStatusLabel =
+    saveStatus === "saving"
+      ? "Saving changes"
+      : saveStatus === "error"
+        ? "Save failed"
+        : hasChanges
+          ? "Unsaved changes"
+          : saveStatus === "saved"
+            ? "Saved"
+            : "All changes saved";
+  const saveStatusClass =
+    saveStatus === "error"
+      ? "bg-burgundy"
+      : saving
+        ? "bg-ochre"
+        : hasChanges
+          ? "bg-terracotta-deep"
+          : "bg-sage";
 
   return (
     <div className="flex min-h-0 w-96 flex-col self-stretch overflow-hidden border-l border-ink-faded/15 text-ink shadow-[-8px_0_24px_rgba(0,0,0,0.08)]" style={{ background: "#f3e7d1" }}>
@@ -491,6 +526,19 @@ function EditSidebar({
       </div>
 
       <div className="flex-none border-t border-ink-faded/10 px-5 py-4">
+        <div className="mb-3 flex min-h-5 items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className={`h-1.5 w-1.5 flex-none rounded-full ${saveStatusClass}`} aria-hidden="true" />
+            <span className="truncate font-mono text-[9px] uppercase tracking-wider text-ink-faded">
+              {saveStatusLabel}
+            </span>
+          </div>
+          {hasChanges && !saving && saveStatus !== "error" && (
+            <span className="flex-none font-mono text-[8px] uppercase tracking-wider text-ink-faded/55">
+              Auto-save on
+            </span>
+          )}
+        </div>
         <div className="flex gap-2">
           <button
             onClick={onSave}
@@ -501,7 +549,7 @@ function EditSidebar({
                 : "cursor-not-allowed border border-ink-faded/20 bg-paper-2 text-ink-faded"
             }`}
           >
-            {saving ? "Saving..." : "Save"}
+            {saving ? "Saving..." : saveStatus === "error" ? "Retry Save" : "Save"}
           </button>
           <button
             onClick={onDiscard}
@@ -584,23 +632,75 @@ export default function BookPage(): React.ReactElement {
   const [idx, setIdx] = useState(0);
   const [editMode, setEditMode] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<SelectedSlot | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [swapFlash, setSwapFlash] = useState<SelectedSlot | null>(null);
 
+  const bookRef = useRef<BookData | null>(null);
+  const draftBookRef = useRef<BookData | null>(null);
+  const draftRevisionRef = useRef(0);
+  const saveInFlightRef = useRef(false);
+  const queuedSaveRef = useRef(false);
+  const savedStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const isProgrammaticScrollRef = useRef(false);
   const scrollTimeoutRef = useRef<number | null>(null);
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const setBookState = useCallback((next: BookData | null) => {
+    bookRef.current = next;
+    setBook(next);
+  }, []);
+
+  const setDraftBookState = useCallback((next: BookData | null) => {
+    draftBookRef.current = next;
+    setDraftBook(next);
+  }, []);
+
+  const updateDraftBook = useCallback((updater: (prev: BookData | null) => BookData | null) => {
+    const next = updater(draftBookRef.current);
+    draftBookRef.current = next;
+    setDraftBook(next);
+  }, []);
+
+  const markDraftDirty = useCallback(() => {
+    draftRevisionRef.current += 1;
+    if (saveInFlightRef.current) {
+      queuedSaveRef.current = true;
+    }
+    setSaveStatus((current) => (current === "saving" ? current : "idle"));
+  }, []);
+
+  const clearAutoSaveTimer = useCallback(() => {
+    if (autoSaveTimer.current) {
+      clearTimeout(autoSaveTimer.current);
+      autoSaveTimer.current = null;
+    }
+  }, []);
+
+  const showSavedStatus = useCallback(() => {
+    if (savedStatusTimerRef.current) {
+      clearTimeout(savedStatusTimerRef.current);
+    }
+    setSaveStatus("saved");
+    savedStatusTimerRef.current = setTimeout(() => {
+      setSaveStatus((current) => (current === "saved" ? "idle" : current));
+      savedStatusTimerRef.current = null;
+    }, 1800);
+  }, []);
 
   const fetchBook = useCallback(async () => {
     if (!bookId) return;
     const res = await fetch(`/api/books/${bookId}`);
     const data = await res.json();
     if (data.book) {
-      setBook(data.book);
-      setDraftBook(data.book);
+      const nextBook = data.book as BookData;
+      setBookState(nextBook);
+      setDraftBookState(nextBook);
+      draftRevisionRef.current = 0;
+      setSaveStatus("idle");
     }
-  }, [bookId]);
+  }, [bookId, setBookState, setDraftBookState]);
 
   useEffect(() => {
     void fetchBook();
@@ -665,8 +765,12 @@ export default function BookPage(): React.ReactElement {
       if (scrollTimeoutRef.current) {
         window.clearTimeout(scrollTimeoutRef.current);
       }
+      clearAutoSaveTimer();
+      if (savedStatusTimerRef.current) {
+        clearTimeout(savedStatusTimerRef.current);
+      }
     };
-  }, []);
+  }, [clearAutoSaveTimer]);
 
   const next = useCallback(() => {
     const target = Math.min(idx + 1, spreads.length - 1);
@@ -680,11 +784,20 @@ export default function BookPage(): React.ReactElement {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight" || e.key === " ") next();
-      else if (e.key === "ArrowLeft") prev();
-      else if (e.key === "Escape" && editMode) {
+      if (e.key === "Escape" && editMode) {
         setEditMode(false);
         setSelectedSlot(null);
+        return;
+      }
+      if (isKeyboardInputTarget(e.target)) {
+        return;
+      }
+      if (e.key === "ArrowRight" || e.key === " ") {
+        e.preventDefault();
+        next();
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        prev();
       }
     };
     window.addEventListener("keydown", onKey);
@@ -776,10 +889,7 @@ export default function BookPage(): React.ReactElement {
 
   const hasChanges = useMemo(() => {
     if (!book || !draftBook) return false;
-    if (book.title !== draftBook.title) return true;
-    if (JSON.stringify(book.placementJson) !== JSON.stringify(draftBook.placementJson)) return true;
-    if (JSON.stringify(book.photos) !== JSON.stringify(draftBook.photos)) return true;
-    return false;
+    return hasBookChanges(book, draftBook);
   }, [book, draftBook]);
 
   const handleSelectSlot = useCallback((spreadIndex: number, slotId: string) => {
@@ -793,7 +903,8 @@ export default function BookPage(): React.ReactElement {
 
   const handleSwap = useCallback(
     (from: SelectedSlot, to: SelectedSlot) => {
-      setDraftBook((prev) => {
+      markDraftDirty();
+      updateDraftBook((prev) => {
         if (!prev) return prev;
         const next = structuredClone(prev);
         const fromSpread = next.placementJson?.[from.spreadIndex];
@@ -822,11 +933,12 @@ export default function BookPage(): React.ReactElement {
       setSwapFlash(to);
       setTimeout(() => setSwapFlash(null), 600);
     },
-    []
+    [markDraftDirty, updateDraftBook]
   );
 
   const handleReplaceSlotPhoto = useCallback((target: SelectedSlot, photoId: string) => {
-    setDraftBook((prev) => {
+    markDraftDirty();
+    updateDraftBook((prev) => {
       if (!prev) return prev;
       const next = structuredClone(prev);
       const placements = next.placementJson;
@@ -871,10 +983,11 @@ export default function BookPage(): React.ReactElement {
     setSelectedSlot(target);
     setSwapFlash(target);
     setTimeout(() => setSwapFlash(null), 600);
-  }, []);
+  }, [markDraftDirty, updateDraftBook]);
 
   const handleUpdateText = useCallback((spreadIndex: number, key: string, value: string) => {
-    setDraftBook((prev) => {
+    markDraftDirty();
+    updateDraftBook((prev) => {
       if (!prev) return prev;
       const next = structuredClone(prev);
       const spread = next.placementJson?.[spreadIndex];
@@ -883,20 +996,22 @@ export default function BookPage(): React.ReactElement {
       spread.texts[key] = value;
       return next;
     });
-  }, []);
+  }, [markDraftDirty, updateDraftBook]);
 
   const handleUpdateCaption = useCallback((photoId: string, caption: string) => {
-    setDraftBook((prev) => {
+    markDraftDirty();
+    updateDraftBook((prev) => {
       if (!prev) return prev;
       const next = structuredClone(prev);
       const photo = next.photos.find((p) => p.id === photoId);
       if (photo) photo.caption = caption;
       return next;
     });
-  }, []);
+  }, [markDraftDirty, updateDraftBook]);
 
   const handleAdjust = useCallback((spreadIndex: number, slotId: string, delta: Partial<PhotoAdjustment>) => {
-    setDraftBook((prev) => {
+    markDraftDirty();
+    updateDraftBook((prev) => {
       if (!prev) return prev;
       const next = structuredClone(prev);
       const spread = next.placementJson?.[spreadIndex];
@@ -912,19 +1027,31 @@ export default function BookPage(): React.ReactElement {
       if (delta.rotation !== undefined) assignment.adjustments.rotation = delta.rotation;
       return next;
     });
-  }, []);
+  }, [markDraftDirty, updateDraftBook]);
 
-  const handleSave = useCallback(async () => {
-    if (!book || !draftBook) return;
-    setSaving(true);
+  const persistDraft = useCallback(async (): Promise<boolean> => {
+    const currentBook = bookRef.current;
+    const currentDraftBook = draftBookRef.current;
+
+    if (!currentBook || !currentDraftBook) {
+      setSaveStatus("idle");
+      return false;
+    }
+    if (!hasBookChanges(currentBook, currentDraftBook)) {
+      setSaveStatus("idle");
+      return true;
+    }
+
+    const revisionAtStart = draftRevisionRef.current;
+    setSaveStatus("saving");
 
     try {
       const captionPromises: Promise<Response>[] = [];
-      for (const draftPhoto of draftBook.photos) {
-        const original = book.photos.find((p) => p.id === draftPhoto.id);
+      for (const draftPhoto of currentDraftBook.photos) {
+        const original = currentBook.photos.find((p) => p.id === draftPhoto.id);
         if (original && original.caption !== draftPhoto.caption) {
           captionPromises.push(
-            fetch(`/api/sessions/${book.sessionId}/photos/${draftPhoto.id}`, {
+            fetch(`/api/sessions/${currentBook.sessionId}/photos/${draftPhoto.id}`, {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ caption: draftPhoto.caption }),
@@ -935,51 +1062,85 @@ export default function BookPage(): React.ReactElement {
 
       const captionResponses = await Promise.all(captionPromises);
       if (captionResponses.some((response) => !response.ok)) {
-        return;
+        throw new Error("Caption save failed");
       }
 
-      const res = await fetch(`/api/books/${book.id}`, {
+      const res = await fetch(`/api/books/${currentBook.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: draftBook.title,
-          placementJson: draftBook.placementJson,
-          sessionId: book.sessionId,
+          title: currentDraftBook.title,
+          placementJson: currentDraftBook.placementJson,
+          sessionId: currentBook.sessionId,
         }),
       });
 
       if (!res.ok) {
-        return;
+        throw new Error("Book save failed");
       }
-      const data = await res.json();
-      setBook(data.book);
-      setDraftBook(data.book);
-      setSelectedSlot(null);
-    } finally {
-      setSaving(false);
+      const data = (await res.json()) as { book?: BookData };
+      if (!data.book) {
+        throw new Error("Book save response missing book");
+      }
+
+      setBookState(data.book);
+      if (draftRevisionRef.current === revisionAtStart) {
+        setDraftBookState(data.book);
+        showSavedStatus();
+      } else {
+        queuedSaveRef.current = true;
+      }
+
+      return true;
+    } catch {
+      setSaveStatus("error");
+      return false;
     }
-  }, [book, draftBook]);
+  }, [setBookState, setDraftBookState, showSavedStatus]);
+
+  const handleSave = useCallback(async (source: SaveSource = "manual") => {
+    if (source === "manual") {
+      clearAutoSaveTimer();
+    }
+    if (saveInFlightRef.current) {
+      queuedSaveRef.current = true;
+      return;
+    }
+
+    saveInFlightRef.current = true;
+    try {
+      let keepSaving = true;
+      while (keepSaving) {
+        queuedSaveRef.current = false;
+        const saved = await persistDraft();
+        keepSaving = saved && queuedSaveRef.current;
+      }
+    } finally {
+      saveInFlightRef.current = false;
+    }
+  }, [clearAutoSaveTimer, persistDraft]);
 
   const handleDiscard = useCallback(() => {
     if (!book) return;
-    setDraftBook(structuredClone(book));
+    clearAutoSaveTimer();
+    setDraftBookState(structuredClone(book));
+    setSaveStatus("idle");
     setSelectedSlot(null);
-  }, [book]);
+  }, [book, clearAutoSaveTimer, setDraftBookState]);
 
   /* ------------------ Auto-save ------------------ */
 
-  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   useEffect(() => {
     if (!hasChanges || !book || !draftBook) return;
-    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    clearAutoSaveTimer();
     autoSaveTimer.current = setTimeout(() => {
-      void handleSave();
+      autoSaveTimer.current = null;
+      void handleSave("auto");
     }, 1500);
     return () => {
-      if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+      clearAutoSaveTimer();
     };
-  }, [hasChanges, book, draftBook, handleSave]);
+  }, [hasChanges, book, draftBook, clearAutoSaveTimer, handleSave]);
 
   /* ------------------ Render ------------------ */
 
@@ -1128,9 +1289,9 @@ export default function BookPage(): React.ReactElement {
             onUpdateText={handleUpdateText}
             onUpdateCaption={handleUpdateCaption}
             onAdjust={handleAdjust}
-            onSave={handleSave}
+            onSave={() => void handleSave("manual")}
             onDiscard={handleDiscard}
-            saving={saving}
+            saveStatus={saveStatus}
             hasChanges={hasChanges}
             onClose={() => {
               setEditMode(false);
