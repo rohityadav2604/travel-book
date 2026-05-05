@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { assignPhotosToSpreads } from "../../matcher";
 import { getTheme } from "../registry";
+import { destinationThemeConfigs } from "./configs";
 import "./index";
 
 const destinationIds = ["bangkok", "paris", "spain"] as const;
@@ -34,5 +35,16 @@ describe("destination themes", () => {
     expect(assignedCount).toBe(30);
     expect(placements.some((placement) => placement.templateName === "DestinationCover")).toBe(true);
     expect(placements.some((placement) => placement.templateName === "DestinationMap")).toBe(true);
+  });
+
+  it.each(destinationThemeConfigs)("defines a complete asset kit for $id", (config) => {
+    expect(config.assetKit.landmark).toBeTruthy();
+    expect(config.assetKit.pattern).toBeTruthy();
+    expect(config.assetKit.ticketStyle).toBeTruthy();
+    expect(config.assetKit.routeStyle.variant).toBeTruthy();
+    expect(config.assetKit.routeStyle.marker).toBeTruthy();
+    expect(config.assetKit.ephemera.receiptLines).toHaveLength(3);
+    expect(config.assetKit.photoTreatment.coverFilter).toContain("saturate");
+    expect(config.assetKit.photoTreatment.heroFilter).toContain("brightness");
   });
 });

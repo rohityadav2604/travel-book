@@ -1,6 +1,6 @@
 import React from "react";
 import { AdjustableImg } from "../../../components/PageShell";
-import { DestinationMotif, PaperTexture, StampMark, TicketStub } from "../components/motifs";
+import { DestinationMotif, EphemeraScrap, PaperTexture, StampMark, TicketStub } from "../components/motifs";
 import type { DestinationThemeConfig } from "../types";
 
 export default function DestinationHero({
@@ -19,6 +19,7 @@ export default function DestinationHero({
   texts?: Record<string, string> | undefined;
 }): React.ReactElement {
   const { palette, fonts, labels } = config;
+  const { assetKit } = config;
 
   return (
     <div style={{ position: "relative", width: 600, height: 600, overflow: "hidden", background: palette.night, color: palette.paper }}>
@@ -27,13 +28,14 @@ export default function DestinationHero({
           src={photoUrl}
           slotId={photoSlotId}
           className="absolute inset-0 h-full w-full"
-          imgStyle={{ filter: "saturate(.74) contrast(1.02) sepia(.08) brightness(.72)" }}
+          imgStyle={{ filter: assetKit.photoTreatment.heroFilter }}
         />
       ) : (
         <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, ${palette.night}, ${palette.secondaryDeep})` }} />
       )}
       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(90deg, ${palette.night}d9 0%, ${palette.night}7a 48%, transparent 100%)` }} />
       <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, transparent 40%, ${palette.night}d9 100%)` }} />
+      <div style={{ position: "absolute", inset: 0, background: assetKit.photoTreatment.overlay, mixBlendMode: "soft-light" }} />
       <PaperTexture config={config} />
 
       <div style={{ position: "absolute", right: -32, top: 36, opacity: 0.2, color: palette.paper }}>
@@ -72,9 +74,10 @@ export default function DestinationHero({
 
       <TicketStub
         config={config}
-        label={texts?.route || labels.route}
+        label={texts?.route || assetKit.ephemera.primaryTicket}
         style={{ right: 46, bottom: 74, transform: "rotate(7deg)", background: `${palette.paper}e8`, color: palette.inkSoft }}
       />
+      <EphemeraScrap config={config} variant="label" style={{ right: 82, bottom: 132, transform: "rotate(-4deg)" }} />
       <StampMark config={config} label={labels.stamp} style={{ right: 68, top: 86, color: palette.paper, borderColor: palette.paper, opacity: 0.7 }} />
     </div>
   );

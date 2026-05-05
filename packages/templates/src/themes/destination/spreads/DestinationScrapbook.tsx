@@ -1,6 +1,6 @@
 import React from "react";
 import { AdjustableImg } from "../../../components/PageShell";
-import { DestinationMotif, PaperTexture, StampMark, TapeStrip, TicketStub, TileBorder } from "../components/motifs";
+import { DestinationMotif, EphemeraScrap, PaperTexture, StampMark, TapeStrip, TicketStub, TileBorder } from "../components/motifs";
 import type { DestinationThemeConfig } from "../types";
 
 type ScrapPhoto = {
@@ -12,14 +12,14 @@ type ScrapPhoto = {
 };
 
 function PhotoScrap({ config, photo }: { config: DestinationThemeConfig; photo: ScrapPhoto }): React.ReactElement {
-  const { palette, fonts } = config;
+  const { palette, fonts, assetKit } = config;
 
   return (
     <div
       style={{
         position: "absolute",
         padding: 10,
-        background: palette.paper,
+        background: assetKit.ephemera.paper,
         boxShadow: `0 16px 28px ${palette.ink}26`,
         transform: `rotate(${photo.rotation}deg)`,
         ...photo.style,
@@ -30,7 +30,7 @@ function PhotoScrap({ config, photo }: { config: DestinationThemeConfig; photo: 
           src={photo.url}
           slotId={photo.slotId}
           className="h-full w-full"
-          imgStyle={{ filter: "saturate(.82) contrast(.96) sepia(.11) brightness(.96)" }}
+          imgStyle={{ filter: assetKit.photoTreatment.scrapbookFilter }}
         />
       </div>
       {photo.caption && (
@@ -66,6 +66,7 @@ export default function DestinationScrapbook({
   texts?: Record<string, string> | undefined;
 }): React.ReactElement {
   const { palette, fonts, labels } = config;
+  const { assetKit } = config;
   const getPhoto = (slotId: string): { url?: string | undefined; slotId: string; caption?: string | undefined } =>
     photos.find((photo) => photo.slotId === slotId) ?? { slotId };
 
@@ -88,17 +89,19 @@ export default function DestinationScrapbook({
       <div style={{ position: "absolute", right: 26, bottom: 24, opacity: 0.16 }}>
         <DestinationMotif config={config} variant="large" />
       </div>
+      <EphemeraScrap config={config} variant="receipt" style={{ right: 240, top: 116, transform: "rotate(5deg)" }} />
+      <EphemeraScrap config={config} variant="note" style={{ left: 324, bottom: 154, transform: "rotate(-6deg)" }} />
 
       {scraps.map((photo) => (
         <PhotoScrap key={photo.slotId} config={config} photo={photo} />
       ))}
 
       <TapeStrip config={config} style={{ left: 136, top: 66, transform: "rotate(-12deg)" }} />
-      <TapeStrip config={config} style={{ right: 98, top: 62, transform: "rotate(8deg)" }} />
+      <TapeStrip config={config} variant="alternate" style={{ right: 98, top: 62, transform: "rotate(8deg)" }} />
       <TapeStrip config={config} style={{ right: 116, top: 236, transform: "rotate(-6deg)" }} />
-      <TapeStrip config={config} style={{ left: 132, bottom: 178, transform: "rotate(7deg)" }} />
+      <TapeStrip config={config} variant="alternate" style={{ left: 132, bottom: 178, transform: "rotate(7deg)" }} />
 
-      <TicketStub config={config} label={texts?.route || labels.route} style={{ left: 318, bottom: 82, transform: "rotate(-7deg)" }} />
+      <TicketStub config={config} label={texts?.route || assetKit.ephemera.secondaryTicket} style={{ left: 318, bottom: 82, transform: "rotate(-7deg)" }} />
       <StampMark config={config} style={{ left: 44, bottom: 42, width: 72, height: 72, fontSize: 11, opacity: 0.74 }} />
 
       <div

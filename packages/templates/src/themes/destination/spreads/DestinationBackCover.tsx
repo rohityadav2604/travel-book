@@ -1,5 +1,5 @@
 import React from "react";
-import { PaperTexture, StampMark, TicketStub, TileBorder, DestinationMotif } from "../components/motifs";
+import { DestinationMotif, EphemeraScrap, PaperTexture, StampMark, TicketStub, TileBorder } from "../components/motifs";
 import type { DestinationThemeConfig } from "../types";
 
 export default function DestinationBackCover({
@@ -12,6 +12,7 @@ export default function DestinationBackCover({
   texts?: Record<string, string> | undefined;
 }): React.ReactElement {
   const { palette, fonts, labels } = config;
+  const { assetKit } = config;
 
   return (
     <div
@@ -55,10 +56,11 @@ export default function DestinationBackCover({
         </div>
         <TicketStub
           config={config}
-          label={texts?.coordinates ?? labels.coordinates}
+          label={texts?.coordinates ?? assetKit.ephemera.secondaryTicket}
           style={{ transform: "rotate(5deg)", background: `${palette.paper}e6` }}
         />
       </div>
+      <EphemeraScrap config={config} variant="receipt" style={{ right: 76, bottom: 184, transform: "rotate(7deg)", opacity: 0.86 }} />
 
       {/* Left address block */}
       <div style={{ position: "absolute", top: 115, left: 58, width: 260 }}>

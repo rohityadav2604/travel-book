@@ -37,6 +37,48 @@ export type DestinationLabels = {
   scrapbookNote: string;
 };
 
+export type DestinationLandmark = "riverTemple" | "ironSeine" | "sunTile";
+
+export type DestinationPattern = "goldRiver" | "bistroPoster" | "cobaltTile";
+
+export type DestinationTicketStyle = "boat" | "metro" | "rail";
+
+export type DestinationRouteStyle = {
+  variant: "river" | "seine" | "railCoast";
+  marker: "lotus" | "bridge" | "sun";
+};
+
+export type DestinationEphemera = {
+  primaryTicket: string;
+  secondaryTicket: string;
+  receiptTitle: string;
+  receiptLines: [string, string, string];
+  stamp: string;
+  note: string;
+  smallLabel: string;
+  tape: string;
+  tapeAlt: string;
+  tab: string;
+  paper: string;
+};
+
+export type DestinationPhotoTreatment = {
+  coverFilter: string;
+  heroFilter: string;
+  scrapbookFilter: string;
+  mapFilter: string;
+  overlay: string;
+};
+
+export type DestinationAssetKit = {
+  landmark: DestinationLandmark;
+  pattern: DestinationPattern;
+  ticketStyle: DestinationTicketStyle;
+  routeStyle: DestinationRouteStyle;
+  ephemera: DestinationEphemera;
+  photoTreatment: DestinationPhotoTreatment;
+};
+
 export type DestinationThemeConfig = {
   id: DestinationThemeId;
   name: string;
@@ -47,5 +89,6 @@ export type DestinationThemeConfig = {
   fonts: DestinationFontFamilies;
   palette: DestinationPalette;
   labels: DestinationLabels;
+  assetKit: DestinationAssetKit;
   assetCredits: AssetCredit[];
 };

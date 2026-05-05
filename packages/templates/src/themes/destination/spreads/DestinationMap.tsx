@@ -1,6 +1,6 @@
 import React from "react";
 import { AdjustableImg } from "../../../components/PageShell";
-import { DestinationMotif, PaperTexture, RouteMap, StampMark, TicketStub, TileBorder } from "../components/motifs";
+import { DestinationMotif, EphemeraScrap, PaperTexture, RouteMap, StampMark, TicketStub, TileBorder } from "../components/motifs";
 import type { DestinationThemeConfig } from "../types";
 
 export default function DestinationMap({
@@ -17,6 +17,7 @@ export default function DestinationMap({
   texts?: Record<string, string> | undefined;
 }): React.ReactElement {
   const { palette, fonts, labels } = config;
+  const { assetKit } = config;
 
   return (
     <div style={{ position: "relative", width: 600, height: 600, overflow: "hidden", background: palette.paper, color: palette.ink }}>
@@ -77,12 +78,13 @@ export default function DestinationMap({
             src={photoUrl}
             slotId={photoSlotId}
             className="h-full w-full"
-            imgStyle={{ filter: "saturate(.8) contrast(.98) sepia(.1) brightness(.96)" }}
+            imgStyle={{ filter: assetKit.photoTreatment.mapFilter }}
           />
         </div>
       </div>
 
       <TicketStub config={config} label={labels.coordinates} style={{ left: 70, bottom: 112, transform: "rotate(-5deg)" }} />
+      <EphemeraScrap config={config} variant="label" style={{ left: 392, top: 268, transform: "rotate(5deg)" }} />
       <StampMark config={config} style={{ right: 76, top: 68, transform: "rotate(8deg)" }} />
 
       <div

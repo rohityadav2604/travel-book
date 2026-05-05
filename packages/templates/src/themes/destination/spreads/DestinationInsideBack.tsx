@@ -1,5 +1,5 @@
 import React from "react";
-import { PaperTexture, StampMark, TicketStub, RouteMap, DestinationMotif, TileBorder } from "../components/motifs";
+import { DestinationMotif, EphemeraScrap, PaperTexture, RouteMap, StampMark, TicketStub, TileBorder } from "../components/motifs";
 import type { DestinationThemeConfig } from "../types";
 
 export default function DestinationInsideBack({
@@ -11,7 +11,8 @@ export default function DestinationInsideBack({
   tripStats?: { label: string; value: string }[] | undefined;
   texts?: Record<string, string> | undefined;
 }): React.ReactElement {
-  const { palette, fonts, labels } = config;
+  const { palette, fonts } = config;
+  const { assetKit } = config;
 
   const stats = tripStats?.length
     ? tripStats
@@ -124,9 +125,10 @@ export default function DestinationInsideBack({
       {/* Coordinates ticket */}
       <TicketStub
         config={config}
-        label={texts?.coordinates ?? labels.coordinates}
+        label={texts?.coordinates ?? assetKit.ephemera.primaryTicket}
         style={{ left: 55, bottom: 52, transform: "rotate(-4deg)" }}
       />
+      <EphemeraScrap config={config} variant="label" style={{ right: 64, top: 66, transform: "rotate(6deg)" }} />
 
       {/* Page number */}
       <div

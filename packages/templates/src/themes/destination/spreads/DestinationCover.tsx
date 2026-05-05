@@ -1,6 +1,6 @@
 import React from "react";
 import { AdjustableImg } from "../../../components/PageShell";
-import { DestinationMotif, PaperTexture, StampMark, TicketStub, TileBorder } from "../components/motifs";
+import { DestinationMotif, EphemeraScrap, PaperTexture, StampMark, TicketStub, TileBorder } from "../components/motifs";
 import type { DestinationThemeConfig } from "../types";
 
 export default function DestinationCover({
@@ -19,6 +19,7 @@ export default function DestinationCover({
   texts?: Record<string, string> | undefined;
 }): React.ReactElement {
   const { palette, fonts, labels } = config;
+  const { assetKit } = config;
   const displayTitle = title || texts?.title || labels.title;
 
   return (
@@ -42,9 +43,10 @@ export default function DestinationCover({
               src={heroUrl}
               slotId={heroSlotId}
               className="absolute inset-0 h-full w-full"
-              imgStyle={{ filter: `saturate(.76) contrast(.98) sepia(.12) brightness(.82)` }}
+              imgStyle={{ filter: assetKit.photoTreatment.coverFilter }}
             />
             <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, ${palette.night}10 0%, ${palette.night}8f 100%)` }} />
+            <div style={{ position: "absolute", inset: 0, background: assetKit.photoTreatment.overlay, mixBlendMode: "overlay" }} />
           </>
         ) : (
           <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, ${palette.paper2}, ${palette.paper3})` }} />
@@ -98,6 +100,8 @@ export default function DestinationCover({
       </div>
 
       <TicketStub config={config} label={texts?.route || labels.route} style={{ left: 55, top: 82, transform: "rotate(-6deg)" }} />
+      <EphemeraScrap config={config} variant="tab" style={{ right: 72, top: 92, transform: "rotate(8deg)" }} />
+      <EphemeraScrap config={config} variant="label" style={{ left: 76, bottom: 88, transform: "rotate(-4deg)" }} />
       <StampMark config={config} style={{ right: 58, bottom: 62 }} />
       {(date || texts?.date) && (
         <div

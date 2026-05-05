@@ -1,5 +1,5 @@
 import React from "react";
-import { PaperTexture, StampMark, TileBorder, DestinationMotif } from "../components/motifs";
+import { DestinationMotif, EphemeraScrap, PaperTexture, StampMark, TileBorder } from "../components/motifs";
 import type { DestinationThemeConfig } from "../types";
 
 export default function DestinationQuote({
@@ -36,6 +36,7 @@ export default function DestinationQuote({
         label={texts?.stampCity ?? config.labels.stamp}
         style={{ left: 50, bottom: 55, transform: "rotate(-12deg)", opacity: 0.6 }}
       />
+      <EphemeraScrap config={config} variant="tab" style={{ right: 58, bottom: 72, transform: "rotate(7deg)" }} />
 
       {/* Centered quote block */}
       <div
